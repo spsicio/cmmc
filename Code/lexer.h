@@ -8,7 +8,8 @@ extern char token_str[];
 extern float token_float_val;
 extern int token_int_val;
 extern int lineno;
-extern bool have_error;
+extern int error_cnt;
+extern char* token_name[];
 
 typedef enum {
   kEOF,
