@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #define MAX_TOKEN_LEN (255)
 
+extern FILE *fp;
 extern char token_str[];
 extern float token_float_val;
 extern int token_int_val;

@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include "lexer.h"
 
-int main() {
+int main(int argc, char **argv) {
+  if (argc <= 1) return 1;
+  fp = fopen(argv[1], "r");
   Token t = get_token();
   while (t != kEOF) {
     printf("get %s at lineno %d.\n", token_name[t], lineno);

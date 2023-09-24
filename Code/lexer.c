@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "lexer.h"
 
+FILE *fp;
 char token_str[MAX_TOKEN_LEN + 1];
 float token_float_val;
 int token_int_val;
@@ -50,18 +51,53 @@ char *token_name[] = {
     } while (0)
 
 #define check_suffix() do { \
-      if (isalpha(last_char) || last_char == '_') { \
-        do read_char(); while (isalnum(last_char) || last_char == '_'); \
+      if (isalpha(last_char) || last_char == '_' || last_char == '.') { \
+        read_suffix(); \
         ++error_cnt; \
         printf("Error type A at Line %d: Invalid suffix.\n", lineno); \
         return get_token(); \
       } \
     } while (0)
 
+#define process_float() do { \
+      if (last_char == 'e' || last_char == 'E') { \
+        token_str_putc(&i, last_char); \
+        read_char(); \
+        if (last_char == '+' || last_char == '-') { \
+          token_str_putc(&i, last_char); \
+          read_char(); \
+        } \
+        if (isdigit(last_char)) { \
+          do { \
+            token_str_putc(&i, last_char); \
+            read_char(); \
+          } while (isdigit(last_char)); \
+        } else { \
+          read_suffix(); \
+          ++error_cnt; \
+          printf("Error type A at line %d: exponent has no digits.\n", lineno); \
+          return get_token(); \
+        } \
+      } \
+      check_suffix(); \
+      check_token_strlen(i); \
+      token_str[i] = '\0'; \
+      token_float_val = strtod(token_str, NULL); \
+      return kFLOAT; \
+    } while (0);
+
 static char last_char = ' ';
 void read_char() {
-  last_char = getchar();
   if (last_char == '\n') ++lineno;
+  last_char = fgetc(fp);
+}
+void read_suffix() {
+  while (isalnum(last_char) || last_char == '_' || last_char == '.') {
+    read_char();
+  };
+}
+void token_str_putc(int *i, char c) {
+  if (*i < MAX_TOKEN_LEN) token_str[(*i)++] = c;
 }
 
 bool is8digit(char c) { return '0' <= c && c <= '7'; }
@@ -100,7 +136,18 @@ Token get_token() {
     case '+': { read_char(); return kPLUS; }
     case ',': { read_char(); return kCOMMA; }
     case '-': { read_char(); return kMINUS; }
-    case '.': { read_char(); return kDOT; }  /// TODO: in case of float
+    case '.': {
+      // processing dot or float
+      read_char();
+      if (!isdigit(last_char)) return kDOT;
+      int i = 0;
+      token_str_putc(&i, '.');
+      do {
+        token_str_putc(&i, last_char);
+        read_char();
+      } while (isdigit(last_char));
+      process_float(); 
+    }
     case '/': {
       read_char();
       if (last_char == '/') {
@@ -125,17 +172,41 @@ Token get_token() {
       }
       return kDIV; 
     }
-    case '0': {  // TODO: details
+    case '0': {
       read_char();
-      if (is8digit(last_char)) {  // TODO: in case of float
+      if (isdigit(last_char)) {
+        // processing oct or float
+        int i = 0;
+        bool isoct = 1;
         token_int_val = 0;
         do {
+          token_str_putc(&i, last_char);
           token_int_val = 8 * token_int_val + last_char - '0';
+          isoct &= is8digit(last_char);
           read_char();
-        } while (is8digit(last_char));
-        check_suffix();
-        return kINT;
+        } while (isdigit(last_char));
+        if (last_char != 'e' && last_char != 'E' && last_char != '.') {
+          if (isoct) {
+            check_suffix();
+            return kINT;
+          } else {
+            read_suffix();
+            ++error_cnt;
+            printf("Error type A at Line %d: invalid oct number.\n", lineno);
+            return get_token();
+          }
+        }
+        if (last_char == '.') {
+          token_str_putc(&i, '.'); 
+          read_char();
+          while (isdigit(last_char)) {
+            token_str_putc(&i, '.');
+            read_char();
+          }
+        }
+        process_float();
       } else if (last_char == 'x' || last_char == 'X') {
+        // processing hex
         read_char();
         if (isxdigit(last_char)) {
           token_int_val = 0;
@@ -146,14 +217,29 @@ Token get_token() {
           check_suffix();
           return kINT;
         } else {
+          check_suffix();
           ++error_cnt;
           printf("Error type A at Line %d: Expected a hex number.\n", lineno);
           return get_token();
         }
       } else {
-        check_suffix();
-        token_int_val = 0;
-        return kINT;
+        // processing zero or float
+        if (last_char != 'e' && last_char != 'E' && last_char != '.') {
+          check_suffix();
+          token_int_val = 0;
+          return kINT;
+        }
+        int i = 0;
+        token_str_putc(&i, '0');
+        if (last_char == '.') {
+          token_str_putc(&i, '.');
+          read_char();
+          while (isdigit(last_char)) {
+            token_str_putc(&i, last_char);
+            read_char();
+          };
+        }
+        process_float();
       }
     }
     case '1': case '2': case '3':
@@ -163,24 +249,24 @@ Token get_token() {
       int i = 0;
       token_int_val = 0;
       do {
-        if (i < MAX_TOKEN_LEN) token_str[i++] = last_char;
+        token_str_putc(&i, last_char);
         token_int_val = 10 * token_int_val + last_char - '0';
         read_char();
       } while (isdigit(last_char));
-      if (last_char != 'e' && last_char != 'E') check_suffix();
-      if (last_char != 'e' && last_char != 'E' && last_char != '.') return kINT;
-      // processing float TODO: eE
-      if (i < MAX_TOKEN_LEN) token_str[i++] = '.';
-      read_char();
-      while (isdigit(last_char)) {
-        if (i < MAX_TOKEN_LEN) token_str[i++] = last_char;
-        read_char();
+      if (last_char != 'e' && last_char != 'E' && last_char != '.')  {
+        check_suffix();
+        return kINT;
       }
-      if (last_char != 'e' && last_char != 'E') check_suffix();
-      check_token_strlen(i);
-      token_str[i] = '\0';
-      token_float_val = strtod(token_str, NULL);
-      return kFLOAT;
+      // processing float
+      if (last_char == '.') {
+        token_str_putc(&i, '.');
+        read_char();
+        while (isdigit(last_char)) {
+          token_str_putc(&i, last_char);
+          read_char();
+        }
+      }
+      process_float();
     }
     case ';': { read_char(); return kSEMI; }
     case '<': {
@@ -240,13 +326,13 @@ Token get_token() {
       if (isalpha(last_char) || last_char == '_') {
         int i = 0;
         do {
-          if (i < MAX_TOKEN_LEN) token_str[i++] = last_char;
+          token_str_putc(&i, last_char);
           read_char();
         } while (isalnum(last_char) || last_char == '_');
         check_token_strlen(i);
         token_str[i] = '\0';
         if (!strcmp(token_str, "int")) return kTYPE;  
-        if (!strcmp(token_str, "double")) return kTYPE;
+        if (!strcmp(token_str, "float")) return kTYPE;
         if (!strcmp(token_str, "struct")) return kSTRUCT;
         if (!strcmp(token_str, "return")) return kRETURN;
         if (!strcmp(token_str, "if")) return kIF;
