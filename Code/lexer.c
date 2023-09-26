@@ -94,7 +94,7 @@ void read_char() {
 void read_suffix() {
   while (isalnum(last_char) || last_char == '_' || last_char == '.') {
     read_char();
-  };
+  }
 }
 void token_str_putc(int *i, char c) {
   if (*i < MAX_TOKEN_LEN) token_str[(*i)++] = c;

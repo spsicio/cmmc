@@ -1,8 +1,9 @@
 #ifndef CMMC_LEXER_H
 #define CMMC_LEXER_H
 
-#include <stdbool.h>
 #define MAX_TOKEN_LEN (255)
+
+#include <stdio.h>
 
 extern FILE *fp;
 extern char token_str[];
