@@ -40,6 +40,7 @@ char *token_name[] = {
   "IF",
   "ELSE",
   "WHILE",
+  "NAT",
 };
 
 #define check_token_strlen(i) do { \

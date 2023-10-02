@@ -1,7 +1,7 @@
 #ifndef CMMC_LEXER_H
 #define CMMC_LEXER_H
 
-#define MAX_TOKEN_LEN (255)
+#define MAX_TOKEN_LEN (32)
 
 #include <stdio.h>
 
@@ -42,6 +42,7 @@ typedef enum {
   kIF,
   kELSE,
   kWHILE, 
+  kNAT,  // not a type
 } Token;
 
 Token get_token();
