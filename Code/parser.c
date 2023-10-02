@@ -1,7 +1,5 @@
 #include <stdbool.h>
-#include "lexer.h"
 #include "parser.h"
-#include "ast.h"
 
 Token last_token;
 
@@ -19,13 +17,16 @@ int get_token_precedence() {
     case kDIV: return 6;
     case kAND: return 3;
     case kOR: return 2;
-    case kDOT: return 7;
-    case kLB: return 7;
     default: return -1;
   }
 }
 
-#define new_lex_node(token) alloc_lex_node(token_name[token], token, lineno)
+Astnode* new_lex_node() {
+  Astnode *p = alloc_lex_node(token_name[last_token], last_token, lineno);
+  read_token();
+  return p;
+}
+
 #define new_syntax_node(name, chd_num) alloc_syntax_node(name, cur_lineno, chd_num)
 #define build1(p, s0)                              (p)->chd[0] = (s0)
 #define build2(p, s1, ...) build1(p, __VA_ARGS__); (p)->chd[1] = (s1)
@@ -34,18 +35,17 @@ int get_token_precedence() {
 #define build5(p, s4, ...) build4(p, __VA_ARGS__); (p)->chd[4] = (s4)
 #define build6(p, s5, ...) build5(p, __VA_ARGS__); (p)->chd[5] = (s5)
 #define build7(p, s6, ...) build6(p, __VA_ARGS__); (p)->chd[6] = (s6)
-#define free1(p, s0)                             ast_free(s0)
-#define free2(p, s1, ...) free1(p, __VA_ARGS__); ast_free(s1)
-#define free3(p, s2, ...) free2(p, __VA_ARGS__); ast_free(s2)
-#define free4(p, s3, ...) free3(p, __VA_ARGS__); ast_free(s3)
-#define free5(p, s4, ...) free4(p, __VA_ARGS__); ast_free(s4)
-#define free6(p, s5, ...) free5(p, __VA_ARGS__); ast_free(s5)
+#define free1(s0)                          free_ast(s0)
+#define free2(s1, ...) free1(__VA_ARGS__); free_ast(s1)
+#define free3(s2, ...) free2(__VA_ARGS__); free_ast(s2)
+#define free4(s3, ...) free3(__VA_ARGS__); free_ast(s3)
+#define free5(s4, ...) free4(__VA_ARGS__); free_ast(s4)
+#define free6(s5, ...) free5(__VA_ARGS__); free_ast(s5)
 
 Astnode* parser_paren_exp() {
   int cur_lineno = lineno;
-  Astnode *p_lp = new_lex_node(kLP);
-  read_token();
-  Astnode *p_exp = pasrser_exp();
+  Astnode *p_lp = new_lex_node();
+  Astnode *p_exp = parser_exp();
   if (p_exp == NULL) {
     // TODO
     free1(p_lp);
@@ -56,34 +56,29 @@ Astnode* parser_paren_exp() {
     free2(p_lp, p_exp);
     return NULL;
   }
-  Astnode *p_rp = new_lex_node(kRP);
-  read_token();
+  Astnode *p_rp = new_lex_node();
   Astnode *p = new_syntax_node("Exp", 3);
-  build3(p, p_lp, p_exp, p_rp); 
+  build3(p, p_rp, p_exp, p_lp); 
   return p;
 }
 
 Astnode* parser_val_exp() {
   int cur_lineno = lineno;
-  Astnode *p_val = new_lex_ndoe(last_token);
-  Astonde *p = new_syntax_node("Exp", 1);
+  Astnode *p_val = new_lex_node(last_token);
+  Astnode *p = new_syntax_node("Exp", 1);
   build1(p, p_val);
-  read_token();
   return p;
 }
 
 Astnode* parser_id_exp() {
   int cur_lineno = lineno;
-  Astnode *p_id = new_lex_node(kID);
-  read_token();
+  Astnode *p_id = new_lex_node();
   if (last_token == kLP) {
-    Astnode *p_lp = new_lex_node(kLP);
-    read_token();
+    Astnode *p_lp = new_lex_node();
     if (last_token == kRP) {
-      Astnode *p_rp = new_lex_node(kRP);
-      read_token();
+      Astnode *p_rp = new_lex_node();
       Astnode *p = new_syntax_node("Exp", 3);
-      build3(p, p_id, p_lp, p_rp);
+      build3(p, p_rp, p_lp, p_id);
       return p;
     }
     Astnode *p_args = parser_args();
@@ -97,10 +92,9 @@ Astnode* parser_id_exp() {
       free3(p_id, p_lp, p_args);
       return NULL;
     }
-    Astnode *p_rp = new_lex_node(kRP);
-    read_token();
+    Astnode *p_rp = new_lex_node();
     Astnode *p = new_syntax_node("Exp", 4);
-    build4(p, p_id, p_lp, p_args, p_rp);
+    build4(p, p_rp, p_args, p_lp, p_id);
     return p;
   }
   Astnode *p = new_syntax_node("Exp", 1);
@@ -110,8 +104,7 @@ Astnode* parser_id_exp() {
 
 Astnode* parser_uop_exp() {
   int cur_lineno = lineno;
-  Astnode *p_uop = new_lex_node(last_token);
-  read_token();
+  Astnode *p_uop = new_lex_node();
   Astnode *p_exp = parser_primary();
   if (p_exp == NULL) {
     // TODO
@@ -119,87 +112,143 @@ Astnode* parser_uop_exp() {
     return NULL;
   }
   Astnode *p = new_syntax_node("Exp", 2);
-  build2(p, p_uop, p_exp);
+  build2(p, p_exp, p_uop);
   return p;
 }
 
 Astnode* parser_op_rhs(int lst_prec, Astnode *p_lhs) {
+  int cur_lineno = lineno;
   for (;;) {
     int cur_prec = get_token_precedence();
-    if (cur_prec < lst_prec) return lhs;
-    Token op = last_token;
-    // need to save: RELOP
-    // special case: LB, DOT
-    read_token();
-    if (op == kDOT) {
-      if (last_token != kID) return 1;
-      lhs = 0;
-      continue;
+    if (cur_prec <= lst_prec) return p_lhs;
+    Astnode *p_bop = new_lex_node();
+    Astnode *p_rhs = parser_primary();
+    if (p_rhs == NULL) {
+      // TODO
+      return NULL;
     }
-    if (op == kLB) {
-      if (!parser_exp()) return 1;
-      if (last_token != kRB) return 1;
-      read_token();
-      lhs = 0;
-      continue;
-    }
-    int rhs = parser_primary();
-    if (rhs) return 1;
     int nxt_prec = get_token_precedence();
     if (cur_prec < nxt_prec) {
-      rhs = parser_op_rhs(cur_prec, rhs);
+      p_rhs = parser_op_rhs(cur_prec, p_rhs);
+      if (p_rhs == NULL) {
+        // TODO
+        return NULL;
+      }
     }
-    lhs = 0;  // merge lhs, op, rhs
+    Astnode *p_tmp = new_syntax_node("Exp", 3);
+    build3(p_tmp, p_rhs, p_bop, p_lhs);
+    p_lhs = p_tmp;
   }
+  return p_lhs;
 }
 
 Astnode* parser_primary() {
+  int cur_lineno = lineno;
+  Astnode *p;
   switch (last_token) {
-    case kINT: case kFLOAT: return parser_val_exp();
-    case kID: return parser_id_exp(); 
-    case kLP: return parser_paren_exp(); 
-    case kMINUS: case kNOT: return parser_uop_exp();
-    default: return 1;
+    case kINT: case kFLOAT: p = parser_val_exp(); break;
+    case kID: p = parser_id_exp(); break;
+    case kLP: p = parser_paren_exp(); break;
+    case kMINUS: case kNOT: p = parser_uop_exp(); break;
+    default: return NULL;
   }
+  while (last_token == kDOT || last_token == kLB) {
+    Astnode *p_infix = new_lex_node();
+    if (p_infix->type == kDOT) {
+      if (last_token != kID) {
+        // TODO
+        free2(p, p_infix);
+        return NULL;
+      }
+      Astnode *p_id = new_lex_node();
+      Astnode *p_tmp = new_syntax_node("Exp", 3);
+      build3(p_tmp, p_id, p_infix, p);
+      p = p_tmp;
+    } else {
+      Astnode *p_exp = parser_exp();
+      if (p_exp == NULL) {
+        // TODO
+        free2(p, p_infix);
+        return NULL;
+      }
+      if (last_token != kRB) {
+        // TODO
+        free3(p, p_infix, p_exp);
+        return NULL;
+      }
+      Astnode *p_rb = new_lex_node();
+      Astnode *p_tmp = new_syntax_node("Exp", 4);
+      build4(p_tmp, p_rb, p_exp, p_infix, p);
+      p = p_tmp;
+    }
+  }
+  return p;
 }
 
 Astnode* parser_exp() {
   Astnode *p_lhs = parser_primary();
   if (p_lhs == NULL) {
     //TODO
-    return NULL:
+    return NULL;
   }
-  return parser_op_rhs(0, lhs);
+  return parser_op_rhs(0, p_lhs);
 }
 
-int parser_vardec() {
-  if (last_token != kID)
-    return 1;
-  read_token();
+Astnode* parser_vardec() {
+  int cur_lineno = lineno;
+  if (last_token != kID) {
+    // TODO
+    return NULL;
+  }
+  Astnode *p_id = new_lex_node();
+  Astnode *p = new_syntax_node("VarDec", 1);
+  build1(p, p_id);
   while (last_token == kLB) {
-    read_token();
-    if (last_token != kINT)
-      return 1;
-    read_token();
-    if (last_token != kRB)
-      return 1;
-    read_token();
+    Astnode *p_lb = new_lex_node();
+    if (last_token != kINT) {
+      // TODO
+      free2(p, p_lb);
+      return NULL;
+    }
+    Astnode *p_int = new_lex_node();
+    if (last_token != kRB) {
+      // TODO
+      free3(p, p_lb, p_int);
+      return NULL;
+    }
+    Astnode *p_rb = new_lex_node();
+    Astnode *p_tmp = new_syntax_node("VarDec", 4);
+    build4(p_tmp, p_rb, p_int, p_lb, p);
+    p = p_tmp;
   }
-  return 0;
+  return p;
 }
 
-int parser_dec() {
-  if (!parser_vardec())
-    return 1;
+Astnode* parser_dec() {
+  int cur_lineno = lineno;
+  Astnode *p_vardec = parser_vardec();
+  if (p_vardec == NULL) {
+    // TODO
+    return NULL;
+  }
   if (last_token == kASSIGNOP) {
-    read_token();
-    if (!parser_exp())
-      return 1;
+    Astnode *p_assign = new_lex_node();
+    Astnode *p_exp = parser_exp();
+    if (p_exp == NULL) {
+      // TODO
+      free2(p_assign, p_exp);
+      return NULL;
+    }
+    Astnode *p = new_syntax_node("Dec", 3);
+    build3(p, p_exp, p_assign, p_vardec);
+    return p;
   }
-  return 0;
+  Astnode *p = new_syntax_node("Dec", 1);
+  build1(p, p_vardec);
+  return p;
 }
 
-int parser_def() {
+Astnode* parser_def() {
   if (!parser_specifier())
     return 1;
   if (!parser_declist())
@@ -207,7 +256,7 @@ int parser_def() {
   return 0;
 }
 
-int parser_extdef() {
+Astnode* parser_extdef() {
   if (!parser_specifier())
     return 1;
   if (last_token != kID)
@@ -244,7 +293,7 @@ int parser_extdef() {
   }
 }
 
-int parser_paramdec() {
+Astnode* parser_paramdec() {
   if (!parser_specifier())
     return 1;
   if (!parser_vardec())
@@ -252,7 +301,7 @@ int parser_paramdec() {
   return 0;
 }
 
-int parser_specifier() {
+Astnode* parser_specifier() {
   if (last_token == kTYPE) {
     return 0; 
   } else if (last_token == kSTRUCT) {
@@ -282,7 +331,7 @@ int parser_specifier() {
   }
 }
 
-int parser_compst() {
+Astnode* parser_compst() {
   if (last_token != kLC)
     return 1;
   read_token();
@@ -296,7 +345,7 @@ int parser_compst() {
   return 0;
 }
 
-int parser_stmt() {
+Astnode* parser_stmt() {
   switch (last_token) {
     case kLC: {
       if (!parser_compst())
@@ -355,17 +404,30 @@ int parser_stmt() {
 }
 
 Astnode* parser_args() {
-  if (!parser_exp())
-    return 1;
-  if (last_token == kCOMMA) {
-    read_token();
-    if (!parser_args())
-      return 1;
+  int cur_lineno = lineno;
+  Astnode *p_exp = parser_exp();
+  if (p_exp == NULL) {
+    // TODO
+    return NULL;
   }
-  return 0;
+  if (last_token == kCOMMA) {
+    Astnode *p_comma = new_lex_node();
+    Astnode *p_args = parser_args();
+    if (p_args == NULL) {
+      // TODO
+      free2(p_exp, p_comma);
+      return NULL;
+    }
+    Astnode *p = new_syntax_node("Args", 3);
+    build3(p, p_args, p_comma, p_exp);
+    return p;
+  }
+  Astnode *p = new_syntax_node("Args", 1);
+  build1(p, p_exp);
+  return p;
 }
 
-int parser_varlist() {
+Astnode* parser_varlist() {
   if (!parser_paramdec())
     return 1;
   if (last_token == kCOMMA) {
@@ -376,18 +438,31 @@ int parser_varlist() {
   return 0;
 }
 
-int parser_declist() {
-  if (!parser_dec())
-    return 1;
-  if (last_token == kCOMMA) {
-    read_token();
-    if (!parser_declist())
-      return 1;
+Astnode* parser_declist() {
+  int cur_lineno = lineno;
+  Astnode *p_dec = parser_dec();
+  if (parser_dec == NULL) {
+    // TODO
+    return NULL;
   }
-  return 0;
+  if (last_token == kCOMMA) {
+    Astnode *p_comma = new_lex_node();
+    Astnode *p_declist = parser_declist();
+    if (p_declist == NULL) {
+      // TODO
+      free2(p_dec, p_comma);
+      return NULL;
+    }
+    Astnode *p = new_syntax_node("DecList", 3);
+    build3(p, p_declist, p_comma, p_dec);
+    return p;
+  }
+  Astnode *p = new_syntax_node("DecList", 1);
+  build1(p, p_dec);
+  return p;
 }
 
-int parser_deflist() {
+Astnode* parser_deflist() {
   if (last_token == kTYPE || last_token == kSTRUCT) {
     if (!parser_def())
       return 1;
@@ -397,17 +472,31 @@ int parser_deflist() {
   return 0; 
 }
 
-int parser_extdeclist() {
-  if (!parser_vardec())
-    return 1;
-  if (last_token == kCOMMA) {
-    read_token();
-    if (!parser_extdeclist())
-        return 1;
+Astnode* parser_extdeclist() {
+  int cur_lineno = lineno;
+  Astnode *p_vardec = parser_vardec();
+  if (p_vardec == NULL) {
+    // TODO
+    return NULL;
   }
+  if (last_token == kCOMMA) {
+    Astnode *p_comma = new_lex_node();
+    Astnode *p_extdeclist = parser_extdeclist();
+    if (p_extdeclist == NULL) {
+      // TODO
+      free2(p_vardec, p_comma);
+      return NULL;
+    }
+    Astnode *p = new_syntax_node("ExtDecList", 3);
+    build3(p, p_extdeclist, p_comma, p_vardec);
+    return p;
+  }
+  Astnode *p = new_syntax_node("ExtDecList", 1);
+  build1(p, p_vardec);
+  return p;
 }
 
-int parser_extdeflist() {
+Astnode* parser_extdeflist() {
   if (last_token == kTYPE || last_token == kSTRUCT) {
     if (!parser_extdef())
       return 1;
@@ -417,7 +506,7 @@ int parser_extdeflist() {
   return 0;
 }
 
-int parser_stmtlist() {
+Astnode* parser_stmtlist() {
   if (last_token != kRC) {
     if (!parser_stmt())
       return 1;
@@ -427,14 +516,13 @@ int parser_stmtlist() {
   return 0;
 }
 
-int parser_program() {
+Astnode* parser_program() {
   read_token();
   if (!parser_extdeflist())
     return 1;
   return 0;
 }
 
-#undef new_lex_node
 #undef new_syntax_node
 #undef build1
 #undef build2

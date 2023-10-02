@@ -1,6 +1,12 @@
 #ifndef CMMC_PARSER_H
 #define CMMC_PARSER_H
 
+#include "lexer.h"
+#include "ast.h"
+
+extern Token last_token;
+void read_token();
+
 Astnode* parser_primary();
 Astnode* parser_op_rhs(int, Astnode*);
 Astnode* parser_paren_exp();

@@ -1,20 +1,10 @@
 #include <stdio.h>
-#include "lexer.h"
+#include "test.h"
 
 int main(int argc, char **argv) {
   if (argc <= 1) return 1;
   fp = fopen(argv[1], "r");
-  Token t = get_token();
-  while (t != kEOF) {
-    printf("get %s at lineno %d.\n", token_name[t], lineno);
-    if (t == kINT) printf("    : %d\n", token_int_val);
-    if (t == kFLOAT) printf("    : %lf\n", token_float_val);
-    if (t == kRELOP) printf("    : %s\n", token_str);
-    if (t == kID) printf("    : %s\n", token_str);
-    if (t == kTYPE) printf("    : %s\n", token_str);
-    t = get_token();
-  }
-  printf("Here are %d error(s).\n", error_cnt);
+  test_parser_combinator();
   return 0;
 }
 

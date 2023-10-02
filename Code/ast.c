@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "lexer.h"
 #include "ast.h"
 
 Astnode *root;
