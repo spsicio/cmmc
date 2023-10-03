@@ -249,11 +249,27 @@ Astnode* parser_dec() {
 }
 
 Astnode* parser_def() {
-  if (!parser_specifier())
-    return 1;
-  if (!parser_declist())
-    return 1;
-  return 0;
+  int cur_lineno = lineno;
+  Astnode *p_spec = parser_specifier();
+  if (p_spec == NULL) {
+    // TODO
+    return NULL;
+  }
+  Astnode *p_declist = parser_declist();
+  if (p_declist == NULL) {
+    // TODO
+    free1(p_spec);
+    return NULL;
+  }
+  if (last_token != kSEMI) {
+    // TODO
+    free2(p_spec, p_declist);
+    return NULL;
+  }
+  Astnode *p_semi = new_lex_node();
+  Astnode *p = new_syntax_node("Def", 3);
+  build3(p, p_semi, p_declist, p_spec);
+  return p;
 }
 
 Astnode* parser_extdef() {
@@ -293,41 +309,117 @@ Astnode* parser_extdef() {
   }
 }
 
+Astnode* parser_fundec() {
+  if (last_token != kID) {
+    // TODO
+    return NULL;
+  }
+  int cur_lineno = lineno;
+  Astnode *p_id = new_lex_node();
+  if (last_token != kLP) {
+    // TODO
+    free1(p_id);
+    return NULL;
+  }
+  Astnode *p_lp = new_lex_node();
+  if (last_token == kRP) {
+    Astnode *p_rp = new_lex_node();
+    Astnode *p = new_syntax_node("FunDec", 3);
+    build3(p, p_rp, p_lp, p_id);
+    return p;
+  } else {
+    Astnode *p_varlist = parser_varlist();
+    if (p_varlist == NULL) {
+      // TODO
+      free2(p_id, p_lp);
+      return NULL;
+    }
+    if (last_token != kRP) {
+      // TODO
+      free3(p_id, p_lp, p_varlist);
+      return NULL;
+    }
+    Astnode *p_rp = new_lex_node();
+    Astnode *p = new_syntax_node("FunDec", 4);
+    build4(p, p_rp, p_varlist, p_lp, p_id);
+    return p;
+  }
+}
+
 Astnode* parser_paramdec() {
-  if (!parser_specifier())
-    return 1;
-  if (!parser_vardec())
-    return 1;
-  return 0;
+  int cur_lineno = lineno;
+  Astnode *p_spec = parser_specifier();
+  if (p_spec == NULL) {
+    // TODO
+    return NULL;
+  }
+  Astnode *p_vardec = parser_vardec();
+  if (p_vardec == NULL) {
+    // TODO
+    return NULL;
+  }
+  Astnode *p = new_syntax_node("ParamDec", 2);
+  build2(p, p_vardec, p_spec);
+  return p;
 }
 
 Astnode* parser_specifier() {
+  int cur_lineno = lineno;
   if (last_token == kTYPE) {
-    return 0; 
+    Astnode *p_type = new_lex_node();
+    Astnode *p = new_syntax_node("Specifier", 1);
+    build1(p, p_type);
+    return p;
   } else if (last_token == kSTRUCT) {
-    bool ever_ID = false;
-    read_token();
-    if (last_token == kID) {
-      read_token();
-      ever_ID = 1;
-    }
+    Astnode *p_struct = new_lex_node();
+    Astnode *p_id = NULL;
+    if (last_token == kID) p_id = new_lex_node();
     if (last_token != kLC) {
-      if (ever_ID) {
-        return 0;
+      if (p_id != NULL) {
+        Astnode *p = new_syntax_node("Specifier", 1);
+        Astnode *p_struct_spec = new_syntax_node("StructSpecifier", 2);
+        Astnode *p_tag = new_syntax_node("Tag", 1);
+        build1(p, p_struct_spec);
+        build2(p_struct_spec, p_tag, p_struct);
+        build1(p_tag, p_id);
+        return p;
+      } else {
+        // TODO
+        free1(p_struct);
+        return NULL;
       }
-      return 1;
     }
-    read_token();
-    if (parser_deflist()) {
-      return 1;
+    Astnode *p_lc = new_lex_node();
+    Astnode *p_deflist = parser_deflist();
+    if (p_deflist == NULL) {
+      // TODO
+      free3(p_struct, p_id, p_lc);
+      return NULL;
     }
     if (last_token != kRC) {
-      return 1;
+      // TODO
+      free4(p_struct, p_id, p_lc, p_deflist);
+      return NULL;
     }
-    read_token();
-    return 0;
+    Astnode *p_rc = new_lex_node();
+    if (p_id == NULL) {
+      Astnode *p = new_syntax_node("Specifier", 1);
+      Astnode *p_struct_spec = new_syntax_node("StructSpecifier", 4);
+      build1(p, p_struct_spec);
+      build4(p_struct_spec, p_rc, p_deflist, p_lc, p_struct);
+      return p;
+    } else {
+      Astnode *p = new_syntax_node("Specifier", 1);
+      Astnode *p_struct_spec = new_syntax_node("StructSpecifier", 5);
+      Astnode *p_opttag = new_syntax_node("OptTag", 1);
+      build1(p, p_struct_spec);
+      build5(p_struct_spec, p_rc, p_deflist, p_lc, p_opttag, p_struct);
+      build1(p_opttag, p_id);
+      return p;
+    }
   } else {
-    return 1;
+    // TODO
+    return NULL;
   }
 }
 
@@ -345,6 +437,26 @@ Astnode* parser_compst() {
   return 0;
 }
 
+Astnode* parser_return_stmt() {
+  int cur_lineno = lineno;
+  Astnode *p_return = new_lex_node();
+  Astnode *p_exp = parser_exp();
+  if (p_exp == NULL) {
+    // TODO
+    free1(p_return);
+    return NULL;
+  }
+  if (last_token != kSEMI) {
+    // TODO
+    free2(p_return ,p_exp);
+    return NULL;
+  }
+  Astnode *p_semi = new_lex_node(); 
+  Astnode *p = new_syntax_node("Stmt", 3);
+  build3(p, p_semi, p_exp, p_return);
+  return p; 
+}
+
 Astnode* parser_stmt() {
   switch (last_token) {
     case kLC: {
@@ -352,15 +464,7 @@ Astnode* parser_stmt() {
         return 1;
       return 0;
     }
-    case kRETURN: {
-      read_token();
-      if (!parser_exp())
-        return 1;
-      if (last_token != kSEMI)
-        return 1;
-      read_token();
-      return 0;
-    }
+    case kRETURN: return parser_return_stmt();
     case kIF: {
       read_token();
       if (last_token != kLP)
@@ -428,14 +532,27 @@ Astnode* parser_args() {
 }
 
 Astnode* parser_varlist() {
-  if (!parser_paramdec())
-    return 1;
-  if (last_token == kCOMMA) {
-    read_token();
-    if (!parser_varlist())
-      return 1;
+  int cur_lineno = lineno;
+  Astnode *p_paramdec = parser_paramdec();
+  if (p_paramdec == NULL) {
+    // TODO
+    return NULL;
   }
-  return 0;
+  if (last_token == kCOMMA) {
+    Astnode *p_comma = new_lex_node();
+    Astnode *p_varlist = parser_varlist();
+    if (p_varlist == NULL) {
+      // TODO
+      return NULL;
+    }
+    Astnode *p = new_syntax_node("VarList", 3);
+    build3(p, p_varlist, p_comma, p_paramdec);
+    return p;
+  } else {
+    Astnode *p = new_syntax_node("VarList", 1);
+    build1(p, p_paramdec);
+    return p;
+  }
 }
 
 Astnode* parser_declist() {
@@ -463,13 +580,23 @@ Astnode* parser_declist() {
 }
 
 Astnode* parser_deflist() {
-  if (last_token == kTYPE || last_token == kSTRUCT) {
-    if (!parser_def())
-      return 1;
-    if (!parser_deflist())
-      return 1;
+  if (last_token != kTYPE && last_token != kSTRUCT) return NULL;
+  int cur_lineno = lineno;
+  Astnode *p_def = parser_def();
+  if (p_def == NULL) {
+    // TODO
+    return NULL;
   }
-  return 0; 
+  Astnode *p_deflist = parser_deflist();
+  if (p_deflist == NULL) {
+    Astnode *p = new_syntax_node("Deflist", 1);
+    build1(p, p_def);
+    return p;
+  } else {
+    Astnode *p = new_syntax_node("Deflist", 2);
+    build2(p, p_deflist, p_def);
+    return p;
+  }
 }
 
 Astnode* parser_extdeclist() {
@@ -507,20 +634,9 @@ Astnode* parser_extdeflist() {
 }
 
 Astnode* parser_stmtlist() {
-  if (last_token != kRC) {
-    if (!parser_stmt())
-      return 1;
-    if (!parser_stmtlist())
-      return 1;
-  }
-  return 0;
 }
 
 Astnode* parser_program() {
-  read_token();
-  if (!parser_extdeflist())
-    return 1;
-  return 0;
 }
 
 #undef new_syntax_node

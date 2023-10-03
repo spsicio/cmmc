@@ -19,6 +19,7 @@ Astnode* parser_vardec();      // 變量名
 Astnode* parser_dec();         // 可賦值的變量名
 Astnode* parser_def();         // 定義變量
 Astnode* parser_extdef();      // 定義變量，結構體，函數；
+Astnode* parser_fundec();      // 函數名及參數列表
 Astnode* parser_paramdec();    // 標識符＋變量名
 Astnode* parser_specifier();   // 標識符
 Astnode* parser_compst();      // 語句塊

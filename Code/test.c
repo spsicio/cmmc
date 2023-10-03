@@ -18,7 +18,7 @@ void test_lexer() {
 void test_parser_combinator() {
   Astnode *p = NULL;
   read_token();
-  p = parser_extdeclist();
+  p = parser_fundec();
   print_ast(p, 0);
   free_ast(p);
 }
