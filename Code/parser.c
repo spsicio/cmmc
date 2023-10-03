@@ -424,17 +424,37 @@ Astnode* parser_specifier() {
 }
 
 Astnode* parser_compst() {
-  if (last_token != kLC)
-    return 1;
-  read_token();
-  if (!parser_deflist())
-    return 1;
-  if (!parser_stmtlist())
-    return 1;
-  if (last_token != kRC)
-    return 1;
-  read_token();
-  return 0;
+  if (last_token != kLC) {
+    // TODO
+    return NULL;
+  }
+  int cur_lineno = lineno;
+  Astnode *p_lc = new_lex_node();
+  Astnode *p_deflist = parser_deflist();
+  Astnode *p_stmtlist = parser_stmtlist();
+  if (last_token != kRC) {
+    // TODO
+    free3(p_lc, p_deflist, p_stmtlist);
+    return NULL;
+  }
+  Astnode *p_rc = new_lex_node();
+  if (p_deflist == NULL && p_stmtlist == NULL) {
+    Astnode *p = new_syntax_node("CompSt", 2);
+    build2(p, p_rc, p_lc);
+    return p;
+  } else if (p_deflist == NULL) {
+    Astnode *p = new_syntax_node("CompSt", 3);
+    build3(p, p_rc, p_deflist, p_lc);
+    return p;
+  } else if (p_stmtlist == NULL) {
+    Astnode *p = new_syntax_node("CompSt", 3);
+    build3(p, p_rc, p_stmtlist, p_lc);
+    return p;
+  } else {
+    Astnode *p = new_syntax_node("CompSt", 4);
+    build4(p, p_rc, p_stmtlist, p_deflist, p_lc);
+    return p;
+  }
 }
 
 Astnode* parser_return_stmt() {
@@ -457,52 +477,114 @@ Astnode* parser_return_stmt() {
   return p; 
 }
 
+Astnode* parser_if_stmt() {
+  int cur_lineno = lineno;
+  Astnode *p_if = new_lex_node();
+  if (last_token != kLP) {
+    // TODO
+    free1(p_if);
+    return NULL;
+  }
+  Astnode *p_lp = new_lex_node();
+  Astnode *p_exp = parser_exp();
+  if (p_exp == NULL) {
+    // TODO
+    free2(p_if, p_lp);
+    return NULL;
+  }
+  if (last_token != kRP) {
+    // TODO
+    free3(p_if, p_lp, p_exp);
+    return NULL;
+  }
+  Astnode *p_rp = new_lex_node();
+  Astnode *p_stmt = parser_stmt();
+  if (p_stmt == NULL) {
+    // TODO
+    free4(p_if, p_lp, p_exp, p_rp);
+    return NULL;
+  }
+  if (last_token == kELSE) {
+    Astnode *p_else = new_lex_node();
+    Astnode *p_else_stmt = parser_stmt();
+    if (p_else_stmt == NULL) {
+      // TODO
+      free5(p_if, p_lp, p_exp, p_rp, p_else);
+      return NULL;
+    }
+    Astnode *p = new_syntax_node("Stmt", 7);
+    build7(p, p_else_stmt, p_else, p_stmt, p_rp, p_exp, p_lp, p_if);
+    return p;
+  } else {
+    Astnode *p = new_syntax_node("Stmt", 5);
+    build5(p, p_stmt, p_rp, p_exp, p_lp, p_if);
+    return p;
+  }
+}
+
+Astnode* parser_while_stmt() {
+  int cur_lineno = lineno;
+  Astnode *p_while = new_lex_node();
+  if (last_token != kLP) {
+    // TODO
+    free1(p_while);
+    return NULL;
+  }
+  Astnode *p_lp = new_lex_node();
+  Astnode *p_exp = parser_exp();
+  if (p_exp == NULL) {
+    // TODO
+    free2(p_while, p_lp);
+    return NULL;
+  }
+  if (last_token != kRP) {
+    // TODO
+    free3(p_while, p_lp, p_exp);
+    return NULL;
+  }
+  Astnode *p_rp = new_lex_node();
+  Astnode *p_stmt = parser_stmt();
+  if (p_stmt == NULL) {
+    // TODO
+    free4(p_while, p_lp, p_exp, p_rp);
+    return NULL;
+  }
+  Astnode *p = new_syntax_node("Exp", 5);
+  build5(p, p_stmt, p_rp, p_exp, p_lp, p_while);
+  return p;
+}
+
 Astnode* parser_stmt() {
+  int cur_lineno = lineno;
   switch (last_token) {
     case kLC: {
-      if (!parser_compst())
-        return 1;
-      return 0;
+      Astnode *p_compst = parser_compst();
+      if (p_compst == NULL) {
+        // TODO
+        return NULL;
+      }
+      Astnode *p = new_syntax_node("Stmt", 1);
+      build1(p, p_compst);
+      return p;
     }
     case kRETURN: return parser_return_stmt();
-    case kIF: {
-      read_token();
-      if (last_token != kLP)
-        return 1;
-      read_token();
-      if (!parser_exp())
-        return 1;
-      if (last_token != kRP)
-        return 1;
-      read_token();
-      if (!parser_stmt())
-        return 1;
-      if (last_token == kELSE) {
-        if (!parser_stmt())
-          return 1;
-      }
-      return 0;
-    }
-    case kWHILE: {
-      read_token();
-      if (last_token != kLP)
-        return 1;
-      read_token();
-      if (!parser_exp())
-        return 1;
-      if (last_token != kRP)
-        return 1;
-      read_token();
-      if (!parser_stmt())
-        return 1;
-      return 0;
-    }
+    case kIF: return parser_if_stmt();
+    case kWHILE: return parser_while_stmt();
     default: {
-      if (!parser_exp())
-        return 1;
-      if (last_token != kSEMI)
-        return 1;
-      return 0;
+      Astnode *p_exp = parser_exp();
+      if (p_exp == NULL) {
+        // TODO
+        return NULL;
+      }
+      if (last_token != kSEMI) {
+        // TODO
+        free1(p_exp);
+        return NULL;
+      }
+      Astnode *p_semi = new_lex_node();
+      Astnode *p = new_syntax_node("Stmt", 2);
+      build2(p, p_semi, p_exp);
+      return p;
     }
   }
 }
@@ -634,6 +716,23 @@ Astnode* parser_extdeflist() {
 }
 
 Astnode* parser_stmtlist() {
+  if (last_token == kRC || last_token == kEOF) return NULL;
+  int cur_lineno = lineno;
+  Astnode *p_stmt = parser_stmt();
+  if (p_stmt == NULL) {
+    // TODO
+    return NULL;
+  }
+  Astnode *p_stmtlist = parser_stmtlist();
+  if (p_stmtlist == NULL) {
+    Astnode *p = new_syntax_node("StmtList", 1);
+    build1(p, p_stmt);
+    return p;
+  } else {
+    Astnode *p = new_syntax_node("StmtList", 2);
+    build2(p, p_stmtlist, p_stmt);
+    return p;
+  }
 }
 
 Astnode* parser_program() {
