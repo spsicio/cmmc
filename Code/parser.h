@@ -15,11 +15,13 @@ Astnode* parser_id_exp();
 Astnode* parser_uop_exp();
 
 Astnode* parser_exp();         // 表達式
-Astnode* parser_vardec();      // 變量名
+Astnode* parser_vardec(Astnode*, int);
+                               // 變量名
 Astnode* parser_dec();         // 可賦值的變量名
 Astnode* parser_def();         // 定義變量
 Astnode* parser_extdef();      // 定義變量，結構體，函數；
-Astnode* parser_fundec();      // 函數名及參數列表
+Astnode* parser_fundec(Astnode*, int);
+                               // 函數名及參數列表
 Astnode* parser_paramdec();    // 標識符＋變量名
 Astnode* parser_specifier();   // 標識符
 Astnode* parser_compst();      // 語句塊
@@ -29,7 +31,7 @@ Astnode* parser_args();
 Astnode* parser_varlist();
 Astnode* parser_declist();
 Astnode* parser_deflist();
-Astnode* parser_extdeclist();
+Astnode* parser_extdeclist(Astnode*, int);
 Astnode* parser_extdeflist();
 Astnode* parser_stmtlist();
 Astnode* parser_program();

@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include "ast.h"
 
-Astnode *root;
-
 Astnode* alloc_lex_node(const char* name, Token type, int lineno) {
   Astnode* p = (Astnode*)malloc(sizeof(Astnode));
   p->name = name;

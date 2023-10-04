@@ -194,13 +194,14 @@ Astnode* parser_exp() {
   return parser_op_rhs(0, p_lhs);
 }
 
-Astnode* parser_vardec() {
-  int cur_lineno = lineno;
-  if (last_token != kID) {
-    // TODO
-    return NULL;
+Astnode* parser_vardec(Astnode *p_id, int cur_lineno) {
+  if (p_id == NULL) {
+    if (last_token != kID) {
+     // TODO
+     return NULL;
+    }
+    Astnode *p_id = new_lex_node();
   }
-  Astnode *p_id = new_lex_node();
   Astnode *p = new_syntax_node("VarDec", 1);
   build1(p, p_id);
   while (last_token == kLB) {
@@ -226,7 +227,7 @@ Astnode* parser_vardec() {
 
 Astnode* parser_dec() {
   int cur_lineno = lineno;
-  Astnode *p_vardec = parser_vardec();
+  Astnode *p_vardec = parser_vardec(NULL, lineno);
   if (p_vardec == NULL) {
     // TODO
     return NULL;
@@ -273,54 +274,62 @@ Astnode* parser_def() {
 }
 
 Astnode* parser_extdef() {
-  if (!parser_specifier())
-    return 1;
-  if (last_token != kID)
-    return 1;
-  read_token();
-  if (last_token == kSEMI)
-    return 0;
+  int cur_lineno = lineno;
+  Astnode *p_spec = parser_specifier();
+  if (p_spec == NULL) {
+    // TODO
+    return NULL;
+  }
+  if (last_token == kSEMI) {
+    Astnode *p_semi = new_lex_node();
+    Astnode *p = new_syntax_node("ExtDef", 2);
+    build2(p, p_semi, p_spec);
+    return p;
+  }
+  if (last_token != kID) {
+    // TODO
+    free1(p_spec);
+    return NULL;
+  }
+  Astnode *p_id = new_lex_node();
   if (last_token == kLP) {
-    read_token();
-    if (last_token == kRP) {
-      read_token();
-      if (!parser_compst())
-        return 1;
-      return 0;
-    } else {
-      if (!parser_varlist())
-        return 1;
-      if (last_token != kRP)
-        return 1;
-      if (!parser_compst())
-        return 1;
-      return 0;
+    Astnode *p_fundec = parser_fundec(p_id, lineno);
+    if (p_fundec == NULL) {
+      // TODo
+      free1(p_spec);
+      return NULL;
     }
+    Astnode *p_compst = parser_compst();
+    if (p_compst == NULL) {
+      // TODO
+      free2(p_spec, p_fundec);
+      return NULL;
+    }
+    Astnode *p = new_syntax_node("ExtDef", 3);
+    build3(p, p_compst, p_fundec, p_spec);
+    return p;
   } else {
-    if (last_token == kLB) {
+    int nxt_lineno = lineno;
+    Astnode *p_vardec = parser_vardec(p_id, nxt_lineno);
+    Astnode *p_extdeclist = parser_extdeclist(p_vardec, nxt_lineno);
+    if (p_extdeclist == NULL) {
+      // TODO
+      free1(p_spec);
+      return NULL;
     }
-    if (last_token == kCOMMA) {
-      if (!parser_extdeclist())
-        return 1;
+    if (last_token != kSEMI) {
+      // TODO
+      free2(p_spec, p_extdeclist);
+      return NULL;
     }
-    if (last_token != kSEMI)
-      return 1;
-    return 0;
+    Astnode *p_semi = new_lex_node();
+    Astnode *p = new_syntax_node("ExtDef", 3);
+    build3(p, p_semi, p_extdeclist, p_spec);
+    return p;
   }
 }
 
-Astnode* parser_fundec() {
-  if (last_token != kID) {
-    // TODO
-    return NULL;
-  }
-  int cur_lineno = lineno;
-  Astnode *p_id = new_lex_node();
-  if (last_token != kLP) {
-    // TODO
-    free1(p_id);
-    return NULL;
-  }
+Astnode* parser_fundec(Astnode *p_id, int cur_lineno) {
   Astnode *p_lp = new_lex_node();
   if (last_token == kRP) {
     Astnode *p_rp = new_lex_node();
@@ -353,7 +362,7 @@ Astnode* parser_paramdec() {
     // TODO
     return NULL;
   }
-  Astnode *p_vardec = parser_vardec();
+  Astnode *p_vardec = parser_vardec(NULL, lineno);
   if (p_vardec == NULL) {
     // TODO
     return NULL;
@@ -681,16 +690,17 @@ Astnode* parser_deflist() {
   }
 }
 
-Astnode* parser_extdeclist() {
-  int cur_lineno = lineno;
-  Astnode *p_vardec = parser_vardec();
+Astnode* parser_extdeclist(Astnode *p_vardec, int cur_lineno) {
   if (p_vardec == NULL) {
-    // TODO
-    return NULL;
+    p_vardec = parser_vardec(NULL, cur_lineno);
+    if (p_vardec == NULL) {
+      // TODO
+      return NULL;
+    }
   }
   if (last_token == kCOMMA) {
     Astnode *p_comma = new_lex_node();
-    Astnode *p_extdeclist = parser_extdeclist();
+    Astnode *p_extdeclist = parser_extdeclist(NULL, lineno);
     if (p_extdeclist == NULL) {
       // TODO
       free2(p_vardec, p_comma);
@@ -706,13 +716,23 @@ Astnode* parser_extdeclist() {
 }
 
 Astnode* parser_extdeflist() {
-  if (last_token == kTYPE || last_token == kSTRUCT) {
-    if (!parser_extdef())
-      return 1;
-    if (!parser_extdeflist())
-      return 1;
+  if (last_token == kEOF) return NULL;
+  int cur_lineno = lineno;
+  Astnode *p_extdef = parser_extdef();
+  if (p_extdef == NULL) {
+    // TODO
+    return NULL;
   }
-  return 0;
+  Astnode *p_extdeflist = parser_extdeflist();
+  if (p_extdeflist == NULL) {
+    Astnode *p = new_syntax_node("ExtDefList", 1);
+    build1(p, p_extdef);
+    return p;
+  } else {
+    Astnode *p = new_syntax_node("ExtDefList", 2);
+    build2(p, p_extdeflist, p_extdef);
+    return p;
+  } 
 }
 
 Astnode* parser_stmtlist() {
@@ -736,6 +756,12 @@ Astnode* parser_stmtlist() {
 }
 
 Astnode* parser_program() {
+  int cur_lineno = lineno;
+  Astnode *p_extdeflist = parser_extdeflist();
+  if (p_extdeflist == NULL) return NULL;
+  Astnode *p = new_syntax_node("Program", 1);
+  build1(p, p_extdeflist);
+  return p;
 }
 
 #undef new_syntax_node

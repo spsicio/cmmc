@@ -18,8 +18,6 @@ typedef struct Astnode {
   struct Astnode* chd[MAX_CHD_NUM];
 } Astnode;
 
-extern Astnode *root;
-
 Astnode* alloc_lex_node(const char* name, Token type, int lineno);
 Astnode* alloc_syntax_node(const char* name, int lineno, int chd_num);
 void print_ast(Astnode*, int indent);
