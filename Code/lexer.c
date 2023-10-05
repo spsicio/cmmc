@@ -114,6 +114,7 @@ Token get_token() {
     case '!': {
       read_char();
       if (last_char == '=') {
+        read_char();
         token_str[0] = '!';
         token_str[1] = '=';
         token_str[2] = '\0';
@@ -174,10 +175,11 @@ Token get_token() {
       return kDIV; 
     }
     case '0': {
+      int i = 0;
+      token_str_putc(&i, last_char);
       read_char();
       if (isdigit(last_char)) {
         // processing oct or float
-        int i = 0;
         bool isoct = 1;
         token_int_val = 0;
         do {
@@ -201,7 +203,7 @@ Token get_token() {
           token_str_putc(&i, '.'); 
           read_char();
           while (isdigit(last_char)) {
-            token_str_putc(&i, '.');
+            token_str_putc(&i, last_char);
             read_char();
           }
         }
@@ -230,8 +232,6 @@ Token get_token() {
           token_int_val = 0;
           return kINT;
         }
-        int i = 0;
-        token_str_putc(&i, '0');
         if (last_char == '.') {
           token_str_putc(&i, '.');
           read_char();

@@ -40,7 +40,6 @@ Astnode* new_lex_node() {
 #define free3(s2, ...) free2(__VA_ARGS__); free_ast(s2)
 #define free4(s3, ...) free3(__VA_ARGS__); free_ast(s3)
 #define free5(s4, ...) free4(__VA_ARGS__); free_ast(s4)
-#define free6(s5, ...) free5(__VA_ARGS__); free_ast(s5)
 
 Astnode* parser_paren_exp() {
   int cur_lineno = lineno;
@@ -117,10 +116,12 @@ Astnode* parser_uop_exp() {
 }
 
 Astnode* parser_op_rhs(int lst_prec, Astnode *p_lhs) {
-  int cur_lineno = lineno;
+  int cur_lineno = p_lhs->lineno;
   for (;;) {
     int cur_prec = get_token_precedence();
-    if (cur_prec <= lst_prec) return p_lhs;
+    if (cur_prec < lst_prec || (cur_prec == lst_prec && cur_prec != 1)) {
+      return p_lhs;
+    }
     Astnode *p_bop = new_lex_node();
     Astnode *p_rhs = parser_primary();
     if (p_rhs == NULL) {
@@ -128,7 +129,7 @@ Astnode* parser_op_rhs(int lst_prec, Astnode *p_lhs) {
       return NULL;
     }
     int nxt_prec = get_token_precedence();
-    if (cur_prec < nxt_prec) {
+    if (cur_prec < nxt_prec || (cur_prec == nxt_prec && cur_prec == 1)) {
       p_rhs = parser_op_rhs(cur_prec, p_rhs);
       if (p_rhs == NULL) {
         // TODO
@@ -144,7 +145,7 @@ Astnode* parser_op_rhs(int lst_prec, Astnode *p_lhs) {
 
 Astnode* parser_primary() {
   int cur_lineno = lineno;
-  Astnode *p;
+  Astnode *p = NULL;
   switch (last_token) {
     case kINT: case kFLOAT: p = parser_val_exp(); break;
     case kID: p = parser_id_exp(); break;
@@ -200,7 +201,7 @@ Astnode* parser_vardec(Astnode *p_id, int cur_lineno) {
      // TODO
      return NULL;
     }
-    Astnode *p_id = new_lex_node();
+    p_id = new_lex_node();
   }
   Astnode *p = new_syntax_node("VarDec", 1);
   build1(p, p_id);
@@ -453,11 +454,11 @@ Astnode* parser_compst() {
     return p;
   } else if (p_deflist == NULL) {
     Astnode *p = new_syntax_node("CompSt", 3);
-    build3(p, p_rc, p_deflist, p_lc);
+    build3(p, p_rc, p_stmtlist, p_lc);
     return p;
   } else if (p_stmtlist == NULL) {
     Astnode *p = new_syntax_node("CompSt", 3);
-    build3(p, p_rc, p_stmtlist, p_lc);
+    build3(p, p_rc, p_deflist, p_lc);
     return p;
   } else {
     Astnode *p = new_syntax_node("CompSt", 4);
@@ -558,7 +559,7 @@ Astnode* parser_while_stmt() {
     free4(p_while, p_lp, p_exp, p_rp);
     return NULL;
   }
-  Astnode *p = new_syntax_node("Exp", 5);
+  Astnode *p = new_syntax_node("Stmt", 5);
   build5(p, p_stmt, p_rp, p_exp, p_lp, p_while);
   return p;
 }
@@ -649,7 +650,7 @@ Astnode* parser_varlist() {
 Astnode* parser_declist() {
   int cur_lineno = lineno;
   Astnode *p_dec = parser_dec();
-  if (parser_dec == NULL) {
+  if (p_dec == NULL) {
     // TODO
     return NULL;
   }
@@ -680,11 +681,11 @@ Astnode* parser_deflist() {
   }
   Astnode *p_deflist = parser_deflist();
   if (p_deflist == NULL) {
-    Astnode *p = new_syntax_node("Deflist", 1);
+    Astnode *p = new_syntax_node("DefList", 1);
     build1(p, p_def);
     return p;
   } else {
-    Astnode *p = new_syntax_node("Deflist", 2);
+    Astnode *p = new_syntax_node("DefList", 2);
     build2(p, p_deflist, p_def);
     return p;
   }
@@ -777,5 +778,4 @@ Astnode* parser_program() {
 #undef free3
 #undef free4
 #undef free5
-#undef free6
 
