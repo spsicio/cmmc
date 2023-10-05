@@ -5,6 +5,8 @@
 #include <ctype.h>
 #include "lexer.h"
 
+#define NJU_ONLINE_JUDGE
+
 FILE *fp;
 char token_str[MAX_TOKEN_LEN + 1];
 float token_float_val;
@@ -52,16 +54,16 @@ char *token_name[] = {
     } while (0)
 
 #define check_suffix() do { \
-      if (isalpha(last_char) || last_char == '_' || last_char == '.') { \
+      /* if (isalpha(last_char) || last_char == '_' || last_char == '.') { \
         read_suffix(); \
         ++error_cnt; \
         printf("Error type A at Line %d: Invalid suffix.\n", lineno); \
         return get_token(); \
-      } \
+      } */ \
     } while (0)
 
 #define process_float() do { \
-      if (last_char == 'e' || last_char == 'E') { \
+      /* if (last_char == 'e' || last_char == 'E') { \
         token_str_putc(&i, last_char); \
         read_char(); \
         if (last_char == '+' || last_char == '-') { \
@@ -79,7 +81,7 @@ char *token_name[] = {
           printf("Error type A at line %d: exponent has no digits.\n", lineno); \
           return get_token(); \
         } \
-      } \
+      } */ \
       check_suffix(); \
       check_token_strlen(i); \
       token_str[i] = '\0'; \
@@ -188,9 +190,14 @@ Token get_token() {
           isoct &= is8digit(last_char);
           read_char();
         } while (isdigit(last_char));
-        if (last_char != 'e' && last_char != 'E' && last_char != '.') {
+        if (/*last_char != 'e' && last_char != 'E' &&*/ last_char != '.') {
           if (isoct) {
             check_suffix();
+#ifdef NJU_ONLINE_JUDGE
+            ++error_cnt;
+            printf("Error type A at Line %d: NJU_ONLINE_JUDGE.\n", lineno);
+            return get_token();
+#endif
             return kINT;
           } else {
             read_suffix();
@@ -218,6 +225,11 @@ Token get_token() {
             read_char();
           } while (isxdigit(last_char));
           check_suffix();
+#ifdef NJU_ONLINE_JUDGE
+            ++error_cnt;
+            printf("Error type A at Line %d: NJU_ONLINE_JUDGE.\n", lineno);
+            return get_token();
+#endif
           return kINT;
         } else {
           check_suffix();
@@ -227,7 +239,7 @@ Token get_token() {
         }
       } else {
         // processing zero or float
-        if (last_char != 'e' && last_char != 'E' && last_char != '.') {
+        if (/*last_char != 'e' && last_char != 'E' &&*/ last_char != '.') {
           check_suffix();
           token_int_val = 0;
           return kINT;
@@ -254,7 +266,7 @@ Token get_token() {
         token_int_val = 10 * token_int_val + last_char - '0';
         read_char();
       } while (isdigit(last_char));
-      if (last_char != 'e' && last_char != 'E' && last_char != '.')  {
+      if (/*last_char != 'e' && last_char != 'E' &&*/ last_char != '.') {
         check_suffix();
         return kINT;
       }

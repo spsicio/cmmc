@@ -7,33 +7,40 @@
 extern Token last_token;
 void read_token();
 
-Astnode* parser_primary();
-Astnode* parser_op_rhs(int, Astnode*);
-Astnode* parser_paren_exp();
+// EXPRESSION
 Astnode* parser_val_exp();
 Astnode* parser_id_exp();
 Astnode* parser_uop_exp();
+Astnode* parser_paren_exp();
+Astnode* parser_primary();
+Astnode* parser_op_rhs(int, Astnode*);
+Astnode* parser_exp();
 
-Astnode* parser_exp();         // 表達式
-Astnode* parser_vardec(Astnode*, int);
-                               // 變量名
-Astnode* parser_dec();         // 可賦值的變量名
-Astnode* parser_def();         // 定義變量
-Astnode* parser_extdef();      // 定義變量，結構體，函數；
-Astnode* parser_fundec(Astnode*, int);
-                               // 函數名及參數列表
-Astnode* parser_paramdec();    // 標識符＋變量名
-Astnode* parser_specifier();   // 標識符
-Astnode* parser_compst();      // 語句塊
-Astnode* parser_stmt();        // 語句
-
-Astnode* parser_args();
-Astnode* parser_varlist();
-Astnode* parser_declist();
-Astnode* parser_deflist();
-Astnode* parser_extdeclist(Astnode*, int);
-Astnode* parser_extdeflist();
+// STATEMENT
+Astnode* parser_compst();
+Astnode* parser_return_stmt();
+Astnode* parser_if_stmt();
+Astnode* parser_while_stmt();
+Astnode* parser_exp_stmt();
+Astnode* parser_stmt();
 Astnode* parser_stmtlist();
+
+// COMPONENT
+Astnode* parser_args();
+Astnode* parser_paramdec();
+Astnode* parser_varlist();
+Astnode* parser_fundec(Astnode*, int);
+Astnode* parser_vardec(Astnode*, int);
+Astnode* parser_extdeclist(Astnode*, int);
+Astnode* parser_dec();
+Astnode* parser_declist();
+Astnode* parser_specifier();
+
+// DEFINITION
+Astnode* parser_def();
+Astnode* parser_deflist();
+Astnode* parser_extdef();
+Astnode* parser_extdeflist();
 Astnode* parser_program();
 
 #endif  // CMMC_PARSER_H

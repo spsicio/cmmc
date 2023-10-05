@@ -3,7 +3,7 @@ RED="\033[31m"
 GREEN="\033[32m"
 YELLOW="\033[33m"
 RESET="\033[0m"
-PARSER=$1
+PARSER=../../../Code/parser
 
 if [[ -z $PARSER ]]
 then
@@ -11,7 +11,7 @@ then
     exit
 fi
 
-echo -e $YELLOW"Normal Test Set For Lab-1 Group-1.1"$RESET
+echo -e $YELLOW"Sample Test Set For Lab-1 Group-1.1"$RESET
 
 function treeTest() # input file, expect file
 {
@@ -49,7 +49,6 @@ function errorTest() # input file, expect file
 
 TREE_TESTS=$(find inputs/tree -name *.cmm | sort)
 ERROR_TESTS=$(find inputs/error -name *.cmm | sort)
-# HAS_ERROR_TESTS=$(find inputs/has_error -name *.cmm | sort)
 
 echo -e $YELLOW"--- Syntax Tree Testcases ---"$RESET
 
@@ -61,8 +60,6 @@ do
     treeTest $t $e
 done
 
-:<<IGNORE
-
 echo -e $YELLOW"--- Error Reporting Testcases ---"$RESET
 
 for t in $ERROR_TESTS
@@ -72,22 +69,4 @@ do
     # echo $t $e
     errorTest $t $e
 done
-
-echo -e $YELLOW"--- Error Detecting Testcases ---"$RESET
-
-for t in $HAS_ERROR_TESTS
-do
-    TMP=/tmp/parser.output
-    $PARSER $t > $TMP
-    RES=$(cat $TMP | grep "Error")
-    if [[ -z $RES ]]
-    then
-        echo -e "Test ${INPUT##*/} : "$RED"FAILED"$RESET
-        cat $TMP
-    else
-        echo -e "Test ${INPUT##*/} : "$GREEN"PASS"$RESET
-    fi
-done
-
-IGNORE
 

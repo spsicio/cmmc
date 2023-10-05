@@ -55,5 +55,6 @@ void free_ast(Astnode *p) {
   for (i = 0; i < p->chd_num; ++i) {
     free_ast(p->chd[i]);
   }
+  free(p);
 }
 
