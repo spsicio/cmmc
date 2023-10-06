@@ -54,12 +54,13 @@ char *token_name[] = {
     } while (0)
 
 #define check_suffix() do { \
-      /* if (isalpha(last_char) || last_char == '_' || last_char == '.') { \
+      if (isalpha(last_char) || last_char == '_' || last_char == '.') { \
         read_suffix(); \
-        ++error_cnt; \
+        /* ++error_cnt; \
         printf("Error type A at Line %d: Invalid suffix.\n", lineno); \
-        return get_token(); \
-      } */ \
+        return get_token(); */ \
+        return kNAT; \
+      } \
     } while (0)
 
 #define process_float() do { \
@@ -130,9 +131,10 @@ Token get_token() {
         read_char();
         return kAND;
       }
-      ++error_cnt;
-      printf("Error type A at Line %d: Expected \"&&\".\n", lineno);
-      return get_token();
+      //++error_cnt;
+      //printf("Error type A at Line %d: Expected \"&&\".\n", lineno);
+      //return get_token();
+      return kNAT;
     }
     case '(': { read_char(); return kLP; }
     case ')': { read_char(); return kRP; }
@@ -170,9 +172,10 @@ Token get_token() {
             }
           }
         } while (last_char != EOF);
-        ++error_cnt;
-        printf("Error type A at Line %d: Missing \"*/\".\n", lineno);
-        return get_token();
+        //++error_cnt;
+        //printf("Error type A at Line %d: Missing \"*/\".\n", lineno);
+        //return get_token();
+        return kNAT;
       }
       return kDIV; 
     }
@@ -194,16 +197,18 @@ Token get_token() {
           if (isoct) {
             check_suffix();
 #ifdef NJU_ONLINE_JUDGE
-            ++error_cnt;
-            printf("Error type A at Line %d: NJU_ONLINE_JUDGE.\n", lineno);
-            return get_token();
+            //++error_cnt;
+            //printf("Error type A at Line %d: NJU_ONLINE_JUDGE.\n", lineno);
+            //return get_token();
+            return kNAT;
 #endif
             return kINT;
           } else {
             read_suffix();
-            ++error_cnt;
-            printf("Error type A at Line %d: invalid oct number.\n", lineno);
-            return get_token();
+            //++error_cnt;
+            //printf("Error type A at Line %d: invalid oct number.\n", lineno);
+            //return get_token();
+            return kNAT;
           }
         }
         if (last_char == '.') {
@@ -226,16 +231,18 @@ Token get_token() {
           } while (isxdigit(last_char));
           check_suffix();
 #ifdef NJU_ONLINE_JUDGE
-            ++error_cnt;
-            printf("Error type A at Line %d: NJU_ONLINE_JUDGE.\n", lineno);
-            return get_token();
+            //++error_cnt;
+            //printf("Error type A at Line %d: NJU_ONLINE_JUDGE.\n", lineno);
+            //return get_token();
+            return kNAT;
 #endif
           return kINT;
         } else {
           check_suffix();
-          ++error_cnt;
-          printf("Error type A at Line %d: Expected a hex number.\n", lineno);
-          return get_token();
+          //++error_cnt;
+          //printf("Error type A at Line %d: Expected a hex number.\n", lineno);
+          //return get_token();
+          return kNAT;
         }
       } else {
         // processing zero or float
@@ -330,9 +337,10 @@ Token get_token() {
         read_char();
         return kOR;
       }
-      ++error_cnt;
-      printf("Error type A at Line %d: Expected \"||\".\n", lineno);
-      return get_token();
+      //++error_cnt;
+      //printf("Error type A at Line %d: Expected \"||\".\n", lineno);
+      //return get_token();
+      return kNAT;
     }
     case '}': { read_char(); return kRC; }
     default: {
@@ -354,10 +362,11 @@ Token get_token() {
         return kID;
       } else {
         if (last_char == EOF) return kEOF;
-        ++error_cnt;
-        printf("Error type A at Line %d: Mysterious character '%c'.\n", lineno, last_char);
         read_char();
-        return get_token();
+        //++error_cnt;
+        //printf("Error type A at Line %d: Mysterious character '%c'.\n", lineno, last_char);
+        //return get_token();
+        return kNAT;
       }
     }
   }

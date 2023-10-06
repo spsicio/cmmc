@@ -21,3 +21,4 @@ int main(){
   initArray(10);
   buble_sort(10);
 }
+

@@ -10,15 +10,21 @@ void read_token() {
 
 int get_token_precedence() {
   switch (last_token) {
-    case kASSIGNOP: return 1;
-    case kRELOP: return 4;
-    case kPLUS: return 5;
-    case kMINUS: return 5;
-    case kSTAR: return 6;
-    case kDIV: return 6;
-    case kAND: return 3;
-    case kOR: return 2;
-    default: return -1;
+    case kEOF: return 0;
+    case kSEMI: case kCOMMA: return 0;
+    case kASSIGNOP: return 2;
+    case kRELOP: return 5;
+    case kPLUS: return 6;
+    case kMINUS: return 6;
+    case kSTAR: return 7;
+    case kDIV: return 7;
+    case kAND: return 4;
+    case kOR: return 3;
+    case kTYPE: return 0;
+    case kRP: case kRB: case kRC: return 0;
+    case kSTRUCT: return 0;
+    case kRETURN: case kIF: case kELSE: case kWHILE: return 0;
+    default: return 1;
   }
 }
 
@@ -171,8 +177,12 @@ Astnode* parser_op_rhs(int lst_prec, Astnode *p_lhs) {
   int cur_lineno = p_lhs->lineno;
   for (;;) {
     int cur_prec = get_token_precedence();
-    if (cur_prec < lst_prec || (cur_prec == lst_prec && cur_prec != 1)) {
+    if (cur_prec < lst_prec || (cur_prec == lst_prec && cur_prec != 2)) {
       return p_lhs;
+    }
+    if (cur_prec == 1) {
+      free1(p_lhs);
+      return NULL;
     }
     Astnode *p_bop = new_lex_node();
     Astnode *p_rhs = parser_primary();
@@ -181,7 +191,7 @@ Astnode* parser_op_rhs(int lst_prec, Astnode *p_lhs) {
       return NULL;
     }
     int nxt_prec = get_token_precedence();
-    if (cur_prec < nxt_prec || (cur_prec == nxt_prec && cur_prec == 1)) {
+    if (cur_prec < nxt_prec || (cur_prec == nxt_prec && cur_prec == 2)) {
       p_rhs = parser_op_rhs(cur_prec, p_rhs);
       if (p_rhs == NULL) {
         free1(p_lhs);
@@ -214,8 +224,24 @@ Astnode* parser_compst() {
     read_token();
     return NULL;
   }
-  Astnode *p_deflist = parser_deflist();
-  Astnode *p_stmtlist = parser_stmtlist();
+  Astnode *p_deflist = NULL, *p_stmtlist = NULL;
+  for (;;) {
+    if (last_token == kRC) break;
+    if (last_token == kTYPE || last_token == kSTRUCT) {
+      Astnode *p_def = parser_def();
+      if (p_def != NULL) {
+        p_deflist = parser_deflist(p_def, p_def->lineno, false);
+        p_stmtlist = parser_stmtlist(NULL, lineno);
+        break;
+      }
+    } else {
+      Astnode *p_stmt = parser_stmt();
+      if (p_stmt != NULL) {
+        p_stmtlist = parser_stmtlist(p_stmt, p_stmt->lineno);
+        break;
+      }
+    }
+  }
   Astnode *p_rc = parser_token(kRC);
   if (p_rc == NULL) {
     log_error("Missing '}'.");
@@ -341,10 +367,11 @@ Astnode* parser_while_stmt() {
 Astnode* parser_exp_stmt() {
   int cur_lineno = lineno; 
   Astnode *p_exp = parser_exp();
-  if (p_exp == NULL) {
+  if (p_exp == NULL || last_token == kRP || last_token == kRB) {
     log_error("Invalid Expression.");
     while (last_token != kSEMI && last_token != kEOF) read_token();
     read_token();
+    free1(p_exp);
     return NULL;
   }
   Astnode *p_semi = parser_token(kSEMI);
@@ -375,11 +402,12 @@ Astnode* parser_stmt() {
   }
 }
 
-Astnode* parser_stmtlist() {
-  if (last_token == kRC || last_token == kEOF) return NULL;
-  int cur_lineno = lineno;
-  Astnode *p_stmt = parser_stmt();
-  Astnode *p_stmtlist = parser_stmtlist();
+Astnode* parser_stmtlist(Astnode *p_stmt, int cur_lineno) {
+  if (p_stmt == NULL) {
+    if (last_token == kRC || last_token == kEOF) return NULL;
+    p_stmt = parser_stmt();
+  }
+  Astnode *p_stmtlist = parser_stmtlist(NULL, lineno);
   if (p_stmt == NULL) return NULL;
   if (p_stmtlist == NULL) {
     Astnode *p = new_syntax_node("StmtList", 1);
@@ -428,6 +456,7 @@ Astnode* parser_paramdec() {
 }
 
 Astnode* parser_varlist() {
+  if (last_token == kRP) return NULL;
   int cur_lineno = lineno;
   Astnode *p_paramdec = parser_paramdec();
   if (p_paramdec == NULL) return NULL;
@@ -586,7 +615,7 @@ Astnode* parser_specifier() {
         return NULL;
       }
     }
-    Astnode *p_deflist = parser_deflist();
+    Astnode *p_deflist = parser_deflist(NULL, lineno, true);
     Astnode *p_rc = parser_token(kRC);
     if (p_rc == NULL) {
       log_error("Missing '}'");
@@ -655,11 +684,14 @@ Astnode* parser_def() {
   return p;
 }
 
-Astnode* parser_deflist() {
-  if (last_token != kTYPE && last_token != kSTRUCT) return NULL;
-  int cur_lineno = lineno;
-  Astnode *p_def = parser_def();
-  Astnode *p_deflist = parser_deflist();
+Astnode* parser_deflist(Astnode *p_def, int cur_lineno, bool in_spec) {
+  if (p_def == NULL) {
+    if (( in_spec &&  last_token == kRC) ||
+        (!in_spec && (last_token != kTYPE && last_token != kSTRUCT)))
+      return NULL;
+    p_def = parser_def();
+  }
+  Astnode *p_deflist = parser_deflist(NULL, lineno, in_spec);
   if (p_def == NULL) return NULL;
   if (p_deflist == NULL) {
     Astnode *p = new_syntax_node("DefList", 1);

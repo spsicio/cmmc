@@ -1,6 +1,7 @@
 #ifndef CMMC_PARSER_H
 #define CMMC_PARSER_H
 
+#include <stdbool.h>
 #include "lexer.h"
 #include "ast.h"
 
@@ -23,7 +24,7 @@ Astnode* parser_if_stmt();
 Astnode* parser_while_stmt();
 Astnode* parser_exp_stmt();
 Astnode* parser_stmt();
-Astnode* parser_stmtlist();
+Astnode* parser_stmtlist(Astnode*, int);
 
 // COMPONENT
 Astnode* parser_args();
@@ -38,7 +39,7 @@ Astnode* parser_specifier();
 
 // DEFINITION
 Astnode* parser_def();
-Astnode* parser_deflist();
+Astnode* parser_deflist(Astnode*, int, bool);
 Astnode* parser_extdef();
 Astnode* parser_extdeflist();
 Astnode* parser_program();
