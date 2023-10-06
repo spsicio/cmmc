@@ -372,3 +372,8 @@ Token get_token() {
   }
 }
 
+#undef NJU_ONLINE_JUDGE
+#undef check_token_strlen
+#undef check_suffix
+#undef process_float
+

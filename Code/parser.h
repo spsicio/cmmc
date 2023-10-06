@@ -2,7 +2,6 @@
 #define CMMC_PARSER_H
 
 #include <stdbool.h>
-#include "lexer.h"
 #include "ast.h"
 
 extern Token last_token;

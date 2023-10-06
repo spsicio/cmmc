@@ -1,7 +1,7 @@
 #ifndef CCMC_TEST_H
 #define CCMC_TEST_H
 
-#include "lexer.h"
+#include "parser.h"
 
 void test_lexer();
 void test_parser_combinator();

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "parser.h"
+#include "tester.h"
 
 void test_lexer() {
   Token t = get_token();

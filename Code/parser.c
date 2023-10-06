@@ -739,6 +739,12 @@ Astnode* parser_extdef() {
       free1(p_spec);
       return NULL;
     }
+    if (last_token == kSEMI) {
+      log_error("Incomplete Definition of Function.");
+      read_token();
+      free2(p_spec, p_fundec);
+      return NULL;
+    }
     Astnode *p_compst = parser_compst();
     if (p_compst == NULL) {
       free2(p_spec, p_fundec);
@@ -776,9 +782,8 @@ Astnode* parser_extdeflist() {
   Astnode *p_extdef = parser_extdef();
   if (p_extdef == NULL) {
     while (last_token != kTYPE && last_token != kSTRUCT &&
-           last_token != kEOF) {
+           last_token != kEOF)
       read_token();
-    }
   }
   Astnode *p_extdeflist = parser_extdeflist();
   if (p_extdef == NULL) return NULL;
@@ -802,6 +807,7 @@ Astnode* parser_program() {
   return p;
 }
 
+#undef log_error
 #undef new_syntax_node
 #undef build1
 #undef build2
