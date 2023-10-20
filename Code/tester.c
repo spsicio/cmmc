@@ -16,12 +16,12 @@ void test_lexer() {
 }
 
 void test_parser_combinator() {
-  Astnode *p = NULL;
+  Cstnode *p = NULL;
   read_token();
   p = parser_program();
   if (error_cnt == 0) {
-    print_ast(p, 0);
+    print_cst(p, 0);
   }
-  free_ast(p);
+  free_cst(p);
 }
 

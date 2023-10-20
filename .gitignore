@@ -3,4 +3,5 @@ report.pdf
 
 Code/parser
 Code/a.c
+Code/*.o
 

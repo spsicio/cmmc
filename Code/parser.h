@@ -2,46 +2,46 @@
 #define CMMC_PARSER_H
 
 #include <stdbool.h>
-#include "ast.h"
+#include "cst.h"
 
 extern Token last_token;
 void read_token();
 
 // EXPRESSION
-Astnode* parser_val_exp();
-Astnode* parser_id_exp();
-Astnode* parser_uop_exp();
-Astnode* parser_paren_exp();
-Astnode* parser_primary();
-Astnode* parser_op_rhs(int, Astnode*);
-Astnode* parser_exp();
+Cstnode* parser_val_exp();
+Cstnode* parser_id_exp();
+Cstnode* parser_uop_exp();
+Cstnode* parser_paren_exp();
+Cstnode* parser_primary();
+Cstnode* parser_op_rhs(int, Cstnode*);
+Cstnode* parser_exp();
 
 // STATEMENT
-Astnode* parser_compst();
-Astnode* parser_return_stmt();
-Astnode* parser_if_stmt();
-Astnode* parser_while_stmt();
-Astnode* parser_exp_stmt();
-Astnode* parser_stmt();
-Astnode* parser_stmtlist(Astnode*, int);
+Cstnode* parser_compst();
+Cstnode* parser_return_stmt();
+Cstnode* parser_if_stmt();
+Cstnode* parser_while_stmt();
+Cstnode* parser_exp_stmt();
+Cstnode* parser_stmt();
+Cstnode* parser_stmtlist(Cstnode*, int);
 
 // COMPONENT
-Astnode* parser_args();
-Astnode* parser_paramdec();
-Astnode* parser_varlist();
-Astnode* parser_fundec(Astnode*, int);
-Astnode* parser_vardec(Astnode*, int);
-Astnode* parser_extdeclist(Astnode*, int);
-Astnode* parser_dec();
-Astnode* parser_declist();
-Astnode* parser_specifier();
+Cstnode* parser_args();
+Cstnode* parser_paramdec();
+Cstnode* parser_varlist();
+Cstnode* parser_fundec(Cstnode*, int);
+Cstnode* parser_vardec(Cstnode*, int);
+Cstnode* parser_extdeclist(Cstnode*, int);
+Cstnode* parser_dec();
+Cstnode* parser_declist();
+Cstnode* parser_specifier();
 
 // DEFINITION
-Astnode* parser_def();
-Astnode* parser_deflist(Astnode*, int, bool);
-Astnode* parser_extdef();
-Astnode* parser_extdeflist();
-Astnode* parser_program();
+Cstnode* parser_def();
+Cstnode* parser_deflist(Cstnode*, int, bool);
+Cstnode* parser_extdef();
+Cstnode* parser_extdeflist();
+Cstnode* parser_program();
 
 #endif  // CMMC_PARSER_H
 

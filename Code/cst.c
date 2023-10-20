@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "ast.h"
+#include "cst.h"
 
-Astnode* alloc_lex_node(const char* name, Token type, int lineno) {
-  Astnode* p = (Astnode*)malloc(sizeof(Astnode));
+Cstnode* alloc_lex_node(const char* name, Token type, int lineno) {
+  Cstnode* p = (Cstnode*)malloc(sizeof(Cstnode));
   p->name = name;
   p->type = type;
   switch (type) {
@@ -20,8 +20,8 @@ Astnode* alloc_lex_node(const char* name, Token type, int lineno) {
   return p;
 }
 
-Astnode* alloc_syntax_node(const char* name, int lineno, int chd_num) {
-  Astnode* p = (Astnode*)malloc(sizeof(Astnode));
+Cstnode* alloc_syntax_node(const char* name, int lineno, int chd_num) {
+  Cstnode* p = (Cstnode*)malloc(sizeof(Cstnode));
   p->name = name;
   p->type = kNAT;
   p->lineno = lineno;
@@ -29,7 +29,7 @@ Astnode* alloc_syntax_node(const char* name, int lineno, int chd_num) {
   return p;
 }
 
-void print_ast(Astnode *p, int indent) {
+void print_cst(Cstnode *p, int indent) {
   if (p == NULL) return;
   int i;
   for (i = 0; i < indent; ++i) putchar(' ');
@@ -44,16 +44,16 @@ void print_ast(Astnode *p, int indent) {
   } else {
     printf("%s (%d)\n", p->name, p->lineno);
     for (i = 0; i < p->chd_num; ++i) {
-      print_ast(p->chd[i], indent+2);
+      print_cst(p->chd[i], indent+2);
     }
   }
 }
 
-void free_ast(Astnode *p) {
+void free_cst(Cstnode *p) {
   if (p == NULL) return;
   int i;
   for (i = 0; i < p->chd_num; ++i) {
-    free_ast(p->chd[i]);
+    free_cst(p->chd[i]);
   }
   free(p);
 }
