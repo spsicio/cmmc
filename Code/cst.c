@@ -31,8 +31,7 @@ Cstnode* alloc_syntax_node(const char* name, int lineno, int chd_num) {
 
 void print_cst(Cstnode *p, int indent) {
   if (p == NULL) return;
-  int i;
-  for (i = 0; i < indent; ++i) putchar(' ');
+  for (int i = 0; i < indent; ++i) putchar(' ');
   if (p->chd_num == 0) {
     switch (p->type) {
       case kINT: printf("INT: %d\n", p->int_val); break;
@@ -43,7 +42,7 @@ void print_cst(Cstnode *p, int indent) {
     }
   } else {
     printf("%s (%d)\n", p->name, p->lineno);
-    for (i = 0; i < p->chd_num; ++i) {
+    for (int i = 0; i < p->chd_num; ++i) {
       print_cst(p->chd[i], indent+2);
     }
   }
@@ -51,8 +50,7 @@ void print_cst(Cstnode *p, int indent) {
 
 void free_cst(Cstnode *p) {
   if (p == NULL) return;
-  int i;
-  for (i = 0; i < p->chd_num; ++i) {
+  for (int i = 0; i < p->chd_num; ++i) {
     free_cst(p->chd[i]);
   }
   free(p);

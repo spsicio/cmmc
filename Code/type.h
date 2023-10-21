@@ -8,6 +8,14 @@
 #define MAX_STRCT_FIELD_NUM (32)
 #define MAX_FUNCT_PARAM_NUM (32)
 
+typedef enum {
+  kINT_t,
+  kFLT_t,
+  kARRAY,
+  kSTRCT,
+  kFUNCT,
+} TYP_KIND;
+
 typedef struct Field {
   const char* name;
   struct Type* type;
@@ -15,13 +23,7 @@ typedef struct Field {
 } Field, Param;
 
 typedef struct Type {
-  enum {
-    kINT_t,
-    kFLT_t,
-    kARRAY,
-    kSTRCT,
-    kFUNCT,
-  } kind;
+  TYP_KIND kind;
   union {
     struct {
       struct Type *elem_t;

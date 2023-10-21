@@ -25,3 +25,17 @@ void test_parser_combinator() {
   free_cst(p);
 }
 
+void test_avl() {
+  AVLNode *p = NULL;
+  char c, s[32];
+  while (~scanf(" %c %s", &c, s)) {
+    if (c == 'i' || c == 'I') {
+      p = avl_insert(p, s, NULL);
+      print_avl(p, 0);
+    } else {
+      AVLNode *q = avl_find(p, s);
+    }
+  }
+  free_avl(p);
+}
+
