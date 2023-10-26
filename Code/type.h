@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "lexer.h"
 
 #define MAX_ARRAY_DIMSN_NUM (32)
 #define MAX_STRCT_FIELD_NUM (32)
@@ -14,10 +15,11 @@ typedef enum {
   kARRAY,
   kSTRCT,
   kFUNCT,
+  kERR_t,
 } TYP_KIND;
 
 typedef struct Field {
-  const char* name;
+  symstr name;
   struct Type* type;
   struct Field* nxt;
 } Field, Param;
@@ -30,22 +32,26 @@ typedef struct Type {
       uint32_t len[MAX_ARRAY_DIMSN_NUM], dim;
     } array;
     struct {
-      const char *name;
+      symstr name;
       Field *fields;
     } strct;
     struct {
       struct Type *ret_t; 
       Param *params;
+      int paramc;
     } funct;
   };
 } Type;
 
-Type* get_type_int();
-Type* get_type_flt();
+extern Type type_int;
+extern Type type_flt;
+extern Type type_err;
+Field* alloc_field(Type*, const char*);
 void free_field(Field*);
-void free_type(Type*);
 bool type_eq(Type*, Type*);
-bool get_field(Field*, const char*); 
+bool type_isprim(Type*);
+bool type_isdisc(Type*);
+Field* get_field(Field*, const char*); 
 
 #endif  // CMMC_TYPE_H
 

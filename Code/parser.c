@@ -13,7 +13,10 @@ int get_token_precedence() {
     case kEOF: return 0;
     case kSEMI: case kCOMMA: return 0;
     case kASSIGNOP: return 2;
-    case kRELOP: return 5;
+    //case kRELOP: return 5;
+    case kEQ: case kNEQ:
+    case kLT: case kLE:
+    case kGT: case kGE: return 5;
     case kPLUS: return 6;
     case kMINUS: return 6;
     case kSTAR: return 7;

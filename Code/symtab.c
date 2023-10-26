@@ -4,14 +4,14 @@
 
 Symtab *env = NULL;
 
-void scope_push() {
+void symtab_push_scope() {
   Symtab *p = (Symtab*) malloc(sizeof(Symtab));
   p->root = NULL;
   p->nxt = env;
   env = p;
 }
 
-void scope_pop() {
+void symtab_pop_scope() {
   if (env == NULL) return;
   Symtab *p = env->nxt;
   free_avl(env->root);
@@ -31,7 +31,6 @@ Syment* symtab_insert(const char *name) {
   AVLNode *res = avl_find(env->root, name);
   if (res != NULL) return NULL;
   Syment *ent = (Syment*) malloc(sizeof(Syment));
-  strcpy(ent->name, name);
   env->root = avl_insert(env->root, name, ent);
   return ent;
 }

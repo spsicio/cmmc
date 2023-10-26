@@ -7,7 +7,7 @@ typedef struct AVLNode {
   struct AVLNode *fa;
   struct AVLNode *lc;
   struct AVLNode *rc;
-  char name[MAX_TOKEN_LEN];
+  symstr name;
   void *ent;
   int bf;
 } AVLNode;

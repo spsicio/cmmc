@@ -11,7 +11,7 @@ then
     exit
 fi
 
-echo -e $YELLOW"2022S Test Set For Lab-1 Group-1.1"$RESET
+echo -e $YELLOW"2022S Test Set For Lab-1 Group-1.3"$RESET
 
 function treeTest() # input file, expect file
 {

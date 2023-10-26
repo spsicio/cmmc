@@ -11,7 +11,7 @@ typedef struct Cstnode {
   union {
     int int_val;
     float float_val;
-    char str_val[MAX_TOKEN_LEN + 1];
+    symstr str_val;
   };
   int lineno;
   int chd_num; 

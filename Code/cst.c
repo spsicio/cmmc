@@ -11,7 +11,7 @@ Cstnode* alloc_lex_node(const char* name, Token type, int lineno) {
     case kINT: p->int_val = token_int_val; break;
     case kFLOAT: p->float_val = token_float_val; break;
     case kID:
-    case kRELOP:
+    // case kRELOP:
     case kTYPE: strcpy(p->str_val, token_str); break;
     default: break;
   }

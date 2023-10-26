@@ -17,12 +17,11 @@ typedef struct Symtab {
 
 typedef struct Syment {
   SYM_KIND kind;
-  char name[MAX_TOKEN_LEN];
   Type *type;
 } Syment;
 
-void scope_push();
-void scope_pop();
+void symtab_push_scope();
+void symtab_pop_scope();
 Syment* symtab_lookup(const char*);
 Syment* symtab_insert(const char*);
 

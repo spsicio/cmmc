@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+typedef char symstr[MAX_TOKEN_LEN + 1];
+
 extern FILE *fp;
 extern char token_str[];
 extern float token_float_val;
@@ -21,7 +23,13 @@ typedef enum {
   kSEMI,
   kCOMMA,
   kASSIGNOP,
-  kRELOP,
+  //kRELOP,
+  kEQ,
+  kNEQ,
+  kLT,
+  kLE,
+  kGT,
+  kGE,
   kPLUS,
   kMINUS,
   kSTAR,

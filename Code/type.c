@@ -9,30 +9,25 @@ Type type_int = (Type) {
 Type type_flt = (Type) {
     .kind = kFLT_t, };
 
-Type* get_type_int() { return &type_int; }
-Type* get_type_flt() { return &type_flt; }
+Type type_err = (Type) {
+    .kind = kERR_t, };
+
+Field* alloc_field(Type *type, const char *str) {
+  Field *p = malloc(sizeof(Field));
+  strcpy(p->name, str);
+  p->type = type;
+  p->nxt = NULL;
+  return p;
+}
 
 void free_field(Field *p) {
   if (p == NULL) return;
   free_field(p->nxt);
-  free_type(p->type);
-  free(p);
-}
-
-void free_type(Type *p) {
-  if (p == NULL) return;
-  if (p->kind == kARRAY) {
-    free_type(p->array.elem_t);
-  } else if (p->kind == kSTRCT) {
-    free_field(p->strct.fields);
-  } else if (p->kind == kFUNCT) {
-    free_type(p->funct.ret_t);
-    free_field(p->funct.params);
-  }
   free(p);
 }
 
 bool type_eq(Type *p, Type *q) {
+  if (p->kind == kERR_t || q->kind == kERR_t) return true;
   if (p->kind != q->kind) return false;
   switch (p->kind) {
     case kINT_t:
@@ -49,11 +44,26 @@ bool type_eq(Type *p, Type *q) {
   fprintf(stderr, "REACHING INVALID AREA in type_eq.\n");
 }
 
-bool get_field(Field *p, const char* name) {
+bool type_isprim(Type *type) {
+  if (type == NULL) return false;
+  if (type->kind == kINT_t) return true;
+  if (type->kind == kFLT_t) return true;
+  if (type->kind == kERR_t) return true;
+  return false;
+}
+
+bool type_isdisc(Type *type) {
+  if (type == NULL) return false;
+  if (type->kind == kINT_t) return true;
+  if (type->kind == kERR_t) return true;
+  return false;
+}
+
+Field* get_field(Field *p, const char* name) {
   while (p != NULL) {
-    if (!strcmp(p->name, name)) return true;
+    if (!strcmp(p->name, name)) return p;
     p = p->nxt;
   }
-  return false;
+  return NULL;
 }
 

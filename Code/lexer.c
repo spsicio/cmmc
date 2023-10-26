@@ -21,7 +21,13 @@ char *token_name[] = {
   "SEMI",
   "COMMA",
   "ASSIGNOP",
-  "RELOP",
+  //"RELOP",
+  "RELOP",  // EQ
+  "RELOP",  // NEQ
+  "RELOP",  // LT
+  "RELOP",  // LE
+  "RELOP",  // GT
+  "RELOP",  // GE
   "PLUS",
   "MINUS",
   "STAR",
@@ -118,10 +124,11 @@ Token get_token() {
       read_char();
       if (last_char == '=') {
         read_char();
-        token_str[0] = '!';
-        token_str[1] = '=';
-        token_str[2] = '\0';
-        return kRELOP;
+        //token_str[0] = '!';
+        //token_str[1] = '=';
+        //token_str[2] = '\0';
+        //return kRELOP;
+        return kNEQ;
       }
       return kNOT;
     }
@@ -293,40 +300,45 @@ Token get_token() {
       read_char();
       if (last_char == '=') {
         read_char();
-        token_str[0] = '<';
-        token_str[1] = '=';
-        token_str[2] = '\0';
-        return kRELOP;
+        //token_str[0] = '<';
+        //token_str[1] = '=';
+        //token_str[2] = '\0';
+        //return kRELOP;
+        return kLE;
       }
-      token_str[0] = '<';
-      token_str[1] = '\0';
-      return kRELOP;
+      //token_str[0] = '<';
+      //token_str[1] = '\0';
+      //return kRELOP;
+      return kLT;
     }
     case '=': {
       read_char();
       if (last_char == '=') {
         read_char();
-        token_str[0] = '=';
-        token_str[1] = '=';
-        token_str[2] = '\0';
-        return kRELOP;
+        //token_str[0] = '=';
+        //token_str[1] = '=';
+        //token_str[2] = '\0';
+        //return kRELOP;
+        return kEQ;
       }
-      token_str[0] = '=';
-      token_str[1] = '\0';
+      //token_str[0] = '=';
+      //token_str[1] = '\0';
       return kASSIGNOP;
     }
     case '>': {
       read_char();
       if (last_char == '=') {
         read_char();
-        token_str[0] = '>';
-        token_str[1] = '=';
-        token_str[2] = '\0';
-        return kRELOP;
+        //token_str[0] = '>';
+        //token_str[1] = '=';
+        //token_str[2] = '\0';
+        //return kRELOP;
+        return kGE;
       }
-      token_str[0] = '>';
-      token_str[1] = '\0';
-      return kRELOP;  
+      //token_str[0] = '>';
+      //token_str[1] = '\0';
+      //return kRELOP;  
+      return kGT;
     }
     case '[': { read_char(); return kLB; }
     case ']': { read_char(); return kRB; }
