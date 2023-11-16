@@ -4,10 +4,16 @@
 int main(int argc, char **argv) {
   if (argc <= 1) return 1;
   fp = fopen(argv[1], "r");
-  //test_lexer();
-  //test_parser_combinator();
-  //test_ast();
-  test_semantic_checker();
+  read_token();
+  Cstnode *p = parser_program();
+  if (error_cnt == 0) {
+    Astnode *q = ast_prog(p);
+    sem_check(q);
+    if (error_cnt == 0) {
+    }
+    free_ast(q);
+  }
+  free_cst(p);
   return 0;
 }
 

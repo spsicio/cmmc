@@ -54,14 +54,3 @@ void test_ast() {
   free_cst(p);
 }
 
-void test_semantic_checker() {
-  read_token();
-  Cstnode *p = parser_program();
-  if (error_cnt == 0) {
-    Astnode *q = ast_prog(p);
-    sem_check(q);
-    free_ast(q);
-  }
-  free_cst(p);
-}
-

@@ -18,6 +18,7 @@ typedef struct Symtab {
 typedef struct Syment {
   SYM_KIND kind;
   Type *type;
+  int varno;
 } Syment;
 
 void symtab_push_scope();

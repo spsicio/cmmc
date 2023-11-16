@@ -46,6 +46,8 @@ typedef struct Type {
 extern Type type_int;
 extern Type type_flt;
 extern Type type_err;
+extern Type type_read;
+extern Type type_write;
 Field* alloc_field(Type*, const char*);
 void free_field(Field*);
 bool type_eq(Type*, Type*);

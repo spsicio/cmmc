@@ -194,7 +194,7 @@ AST_MAKE_VISIT(CONSTR_SPEC) {
       Field *tail = NULL;
       for (Astnode *q = p->constr_spec.fields; q != NULL; q = q->nxt) {
         if (q->kind == DEF_VAR) {
-            Type *elem_t = sem_check(q->def_var.spec);
+          Type *elem_t = sem_check(q->def_var.spec);
           if (get_field(p->type.strct.fields, q->def_var.name) == NULL) {
             Field *f = alloc_field(&(q->type), q->def_var.name);
             if (q->def_var.dim == 0) {
@@ -206,16 +206,10 @@ AST_MAKE_VISIT(CONSTR_SPEC) {
               for (int i=0; i < q->def_var.dim; ++i)
                 q->type.array.len[i] = q->def_var.len[i];
             }
-            if (tail == NULL) {
-              p->type.strct.fields = f;
-              tail = f;
-            } else {
-              tail->nxt = f;
-              tail = f;
-            }
-            if (q->def_var.init != NULL) {
-              log_error(FIELD_REDEF, q->lineno);
-            }
+            if (tail == NULL) p->type.strct.fields = f;
+            else tail->nxt = f;
+            tail = f;
+            if (q->def_var.init != NULL) log_error(FIELD_REDEF, q->lineno);
           } else {
             log_error(FIELD_REDEF, q->lineno);
           }
@@ -289,13 +283,9 @@ AST_MAKE_VISIT(DEF_FUN) {
     Type *param_t = sem_check(q);
     if (p->type.kind == kFUNCT) {
       Param *f = alloc_field(param_t, q->def_var.name);
-      if (tail == NULL) {
-        p->type.funct.params = f;
-        tail = f;
-      } else {
-        tail->nxt = f;
-        tail = f;
-      }
+      if (tail == NULL) p->type.funct.params = f;
+      else tail->nxt = f;
+      tail = f;
     }
   }
   Type *save_ret_t = cur_ret_t;
@@ -307,6 +297,10 @@ AST_MAKE_VISIT(DEF_FUN) {
 
 AST_MAKE_VISIT(LS_PROG) {
   symtab_push_scope();
+  Syment *entr = symtab_insert("read");
+  Syment *entw = symtab_insert("write");
+  entr->kind = kFUN; entr->type = &type_read;
+  entw->kind = kFUN; entw->type = &type_write;
   for (Astnode *q = p->ls_prog.defs; q != NULL; q = q->nxt) sem_check(q);
   symtab_pop_scope();
 }

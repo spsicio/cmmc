@@ -12,6 +12,22 @@ Type type_flt = (Type) {
 Type type_err = (Type) {
     .kind = kERR_t, };
 
+Type type_read = (Type) {
+    .kind = kFUNCT,
+    .funct.ret_t = &type_int,
+    .funct.params = NULL,
+    .funct.paramc = 0, };
+
+Param param_write = (Param) {
+    .type = &type_int,
+    .nxt = NULL, };
+
+Type type_write = (Type) {
+    .kind = kFUNCT,
+    .funct.ret_t = &type_int,
+    .funct.params = &param_write,
+    .funct.paramc = 1, };
+
 Field* alloc_field(Type *type, const char *str) {
   Field *p = malloc(sizeof(Field));
   strcpy(p->name, str);
