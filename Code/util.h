@@ -11,7 +11,7 @@
 
 #define VISITOR_FUNASGN(KIND) .VisitPtr_##KIND = Visit_##KIND,
 #define VISITOR_DEF(ACCEPTOR, ID) \
-  ACCEPTOR##Visitor ID = (ACCEPTOR##Visitor) { \
+  static ACCEPTOR##Visitor ID = (ACCEPTOR##Visitor) { \
     ACCEPTOR(VISITOR_FUNASGN) \
   };
 

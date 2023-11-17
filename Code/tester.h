@@ -3,6 +3,7 @@
 
 #include "parser.h"
 #include "semantic.h"
+#include "ir.h"
 
 void test_lexer();
 void test_parser_combinator();
