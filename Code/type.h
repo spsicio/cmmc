@@ -30,6 +30,7 @@ typedef struct Type {
     struct {
       struct Type *elem_t;
       uint32_t len[MAX_ARRAY_DIMSN_NUM], dim;
+      uint32_t cof[MAX_ARRAY_DIMSN_NUM], siz;
     } array;
     struct {
       symstr name;

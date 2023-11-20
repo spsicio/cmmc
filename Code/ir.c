@@ -1,8 +1,12 @@
+#include <stdlib.h>
 #include "ir.h"
 
-int cnt_var = 0;
-int cnt_tmp = 0;
-int cnt_lbl = 0;
+Irnode* alloc_irnode(IR_KIND kind) {
+  Irnode *p = (Irnode*) malloc(sizeof(Irnode));
+  p->kind = kind;
+  p->nxt = NULL;
+  return p;
+}
 
 Irlist link_ls(Irlist a, Irlist b) {
   if (a.head == NULL) return b;
@@ -10,6 +14,12 @@ Irlist link_ls(Irlist a, Irlist b) {
   Irlist c = (Irlist) {a.head, b.tail};
   a.tail->nxt = b.head;
   return c;
+}
+
+void ir_push_b(Irlist *ls, Irnode *p) {
+  if (ls->tail == NULL) ls->head = p;
+  else ls->tail->nxt = p;
+  ls->tail = p;
 }
 
 void IrVisitorDispatch(IRVisitor *visitor, Irnode *p, void *arg) {

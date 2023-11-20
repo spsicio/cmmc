@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     Astnode *q = ast_prog(p);
     sem_check(q);
     if (error_cnt == 0) {
-      Irlist irlist = gen_ir(q);
+      Irlist irlist = gen_ir(q, NULL);
       print_ir(irlist.head);
     }
     free_ast(q);

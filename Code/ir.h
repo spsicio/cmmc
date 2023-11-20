@@ -26,10 +26,7 @@ typedef struct {
 #define IR(F) \
     /* BASIC */ \
     F(IR_ASN) \
-    F(IR_ADD) \
-    F(IR_SUB) \
-    F(IR_MUL) \
-    F(IR_DIV) \
+    F(IR_ARI) \
     /* DECLARE */ \
     F(IR_DEC) \
     /* JUMP */ \
@@ -71,17 +68,10 @@ typedef struct Irlist {
   struct Irnode *head, *tail;
 } Irlist;
 
-typedef struct {
-  Irlist list;
-  Opr opr;
-  bool cond;
-} GenAttr;
-
-extern int cnt_var;
-extern int cnt_tmp;
-extern int cnt_lbl;
+Irnode* alloc_irnode(IR_KIND kind);
 Irlist link_ls(Irlist, Irlist);
-Irlist gen_ir(Astnode*);
+void ir_push_b(Irlist*, Irnode*);
+Irlist gen_ir(Astnode*, void*);
 void print_ir(Irnode*);
 void IrVisitorDispatch(IRVisitor*, Irnode*, void*);
 

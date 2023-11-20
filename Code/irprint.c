@@ -13,6 +13,22 @@ static void print_opr(Opr p) {
   }
 }
 
+static void print_opt(Token op) {
+  switch (op) {
+    case kEQ: printf("=="); break;
+    case kNEQ: printf("!="); break;
+    case kLT: printf("<"); break;
+    case kLE: printf("<="); break;
+    case kGT: printf(">"); break;
+    case kGE: printf(">="); break;
+    case kPLUS: printf("+"); break;
+    case kMINUS: printf("-"); break;
+    case kSTAR: printf("*"); break;
+    case kDIV: printf("/"); break;
+    default: return;
+  }
+}
+
 IR(IR_VISIT_FUNDEC)
 VISITOR_DEF(IR, visitor)
 
@@ -30,35 +46,13 @@ IR_MAKE_VISIT(IR_ASN) {
   print_opr(p->src1);
 }
 
-IR_MAKE_VISIT(IR_ADD) {
+IR_MAKE_VISIT(IR_ARI) {
   print_opr(p->dst);
   printf(" := ");
   print_opr(p->src1);
-  printf(" + ");
-  print_opr(p->src2);
-}
-
-IR_MAKE_VISIT(IR_SUB) {
-  print_opr(p->dst);
-  printf(" := ");
-  print_opr(p->src1);
-  printf(" - ");
-  print_opr(p->src2);
-}
-
-IR_MAKE_VISIT(IR_MUL) {
-  print_opr(p->dst);
-  printf(" := ");
-  print_opr(p->src1);
-  printf(" * ");
-  print_opr(p->src2);
-}
-
-IR_MAKE_VISIT(IR_DIV) {
-  print_opr(p->dst);
-  printf(" := ");
-  print_opr(p->src1);
-  printf(" / ");
+  putchar(' ');
+  print_opt(p->op);
+  putchar(' ');
   print_opr(p->src2);
 }
 
@@ -82,7 +76,9 @@ IR_MAKE_VISIT(IR_JMP) {
 IR_MAKE_VISIT(IR_JCN) {
   printf("IF ");
   print_opr(p->src1);
-  printf(" %s ", token_name[p->op]); 
+  putchar(' ');
+  print_opt(p->op);
+  putchar(' ');
   print_opr(p->src2);
   printf(" GOTO ");
   print_opr(p->dst);

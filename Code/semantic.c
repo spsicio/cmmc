@@ -94,8 +94,14 @@ AST_MAKE_VISIT(EXP_ARRAY) {
   if (diff == 0) {
     p->type = *(base_t->array.elem_t);
   } else {
-    p->type = *base_t;
-    p->type.array.dim += diff;
+    p->type.kind = kARRAY;
+    p->type.array.elem_t = base_t->array.elem_t;
+    p->type.array.dim = base_t->array.dim + diff;
+    p->type.array.siz = base_t->array.cof[-1-diff];
+    for (int i=0; i < p->type.array.dim; ++i) {
+      p->type.array.len[i] = base_t->array.len[i-diff];
+      p->type.array.cof[i] = base_t->array.cof[i-diff];
+    }
   }
 }
 
@@ -205,6 +211,12 @@ AST_MAKE_VISIT(CONSTR_SPEC) {
               q->type.array.dim = q->def_var.dim;
               for (int i=0; i < q->def_var.dim; ++i)
                 q->type.array.len[i] = q->def_var.len[i];
+              uint32_t s = 4;
+              for (int i = q->type.array.dim - 1; i >= 0; --i) {
+                q->type.array.cof[i] = s;
+                s *= q->type.array.len[i];
+              }
+              q->type.array.siz = s;
             }
             if (tail == NULL) p->type.strct.fields = f;
             else tail->nxt = f;
@@ -254,6 +266,12 @@ AST_MAKE_VISIT(DEF_VAR) {
       p->type.array.dim = p->def_var.dim;
       for (int i=0; i < p->def_var.dim; ++i)
         p->type.array.len[i] = p->def_var.len[i];
+      uint32_t s = 4;
+      for (int i = p->type.array.dim - 1; i >= 0; --i) {
+        p->type.array.cof[i] = s;
+        s *= p->type.array.len[i];
+      }
+      p->type.array.siz = s;
     }
     if (p->def_var.init != NULL) {
       Type *rhs_t = sem_check(p->def_var.init);
