@@ -70,6 +70,7 @@ typedef struct Irlist {
 
 Irnode* alloc_irnode(IR_KIND kind);
 Irlist link_ls(Irlist, Irlist);
+void ir_push_f(Irlist*, Irnode*);
 void ir_push_b(Irlist*, Irnode*);
 Irlist gen_ir(Astnode*, void*);
 void print_ir(Irnode*);

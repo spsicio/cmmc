@@ -22,6 +22,12 @@ void ir_push_b(Irlist *ls, Irnode *p) {
   ls->tail = p;
 }
 
+void ir_push_f(Irlist *ls, Irnode *p) {
+  if (ls->head == NULL) ls->tail = p;
+  p->nxt = ls->head; 
+  ls->head = p;
+}
+
 void IrVisitorDispatch(IRVisitor *visitor, Irnode *p, void *arg) {
   if (p == NULL) return;
   switch (p->kind) {
