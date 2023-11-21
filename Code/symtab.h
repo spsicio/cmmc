@@ -19,6 +19,7 @@ typedef struct Syment {
   SYM_KIND kind;
   Type *type;
   int varno;
+  bool ref;
 } Syment;
 
 void symtab_push_scope();

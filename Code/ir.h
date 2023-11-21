@@ -52,7 +52,7 @@ typedef struct Irnode {
   IR_KIND kind;
   Opr dst, src1, src2;
   Token op;
-  char* fun_name;
+  const char* fun_name;
 } Irnode;
 
 typedef void (*IrVisitT)(Irnode*, void*);
@@ -68,7 +68,11 @@ typedef struct Irlist {
   struct Irnode *head, *tail;
 } Irlist;
 
-Irnode* alloc_irnode(IR_KIND kind);
+Irnode* alloc_ir_f(IR_KIND kind, const char*);
+Irnode* alloc_ir_d(IR_KIND kind, Opr);
+Irnode* alloc_ir_df(IR_KIND kind, Opr, const char*);
+Irnode* alloc_ir_ds(IR_KIND kind, Opr, Opr);
+Irnode* alloc_ir_dsso(IR_KIND kind, Opr, Opr, Opr, Token);
 Irlist link_ls(Irlist, Irlist);
 void ir_push_f(Irlist*, Irnode*);
 void ir_push_b(Irlist*, Irnode*);
