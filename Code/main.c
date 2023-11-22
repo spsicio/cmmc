@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
           print_ir(irlist.head);
           fclose(firout);
         }
+        free_ir(irlist.head);
       }
     }
     free_ast(q);

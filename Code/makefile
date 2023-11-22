@@ -25,7 +25,7 @@ ir.o: util.h lexer.h cst.h type.h ast.h
 irgen.o: util.h lexer.h cst.h type.h ast.h avl.h symtab.h
 irprint.o: util.h lexer.h cst.h type.h ast.h
 
-.PHONY: clean submit local_test
+.PHONY: clean submit
 clean:
 	-rm parser $(objects)
 

@@ -46,6 +46,12 @@ Irnode* alloc_ir_dsso(IR_KIND kind, Opr dst, Opr src1, Opr src2, Token op) {
   return p;
 }
 
+void free_ir(Irnode *p) {
+  if (p == NULL) return;
+  free(p->nxt);
+  free(p);
+}
+
 Irlist link_ls(Irlist a, Irlist b) {
   if (a.head == NULL) return b;
   if (b.head == NULL) return a;

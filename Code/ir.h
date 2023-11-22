@@ -74,6 +74,7 @@ Irnode* alloc_ir_d(IR_KIND kind, Opr);
 Irnode* alloc_ir_df(IR_KIND kind, Opr, const char*);
 Irnode* alloc_ir_ds(IR_KIND kind, Opr, Opr);
 Irnode* alloc_ir_dsso(IR_KIND kind, Opr, Opr, Opr, Token);
+void free_ir(Irnode*);
 Irlist link_ls(Irlist, Irlist);
 void ir_push_f(Irlist*, Irnode*);
 void ir_push_b(Irlist*, Irnode*);
