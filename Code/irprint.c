@@ -1,30 +1,32 @@
 #include <stdio.h>
 #include "ir.h"
 
+FILE *firout;
+
 static void print_opr(Opr p) {
-  if (p.ref) putchar('&');
-  if (p.deref) putchar('*');
+  if (p.ref) fputc('&', firout);
+  if (p.deref) fputc('*', firout);
   switch (p.kind) {
-    case OPR_LIT: printf("#%d", p.litval); break;
-    case OPR_VAR: printf("v%d", p.varno); break;
-    case OPR_TMP: printf("t%d", p.tmpno); break;
-    case OPR_LBL: printf("label%d", p.lblno); break;
+    case OPR_LIT: fprintf(firout, "#%d", p.litval); break;
+    case OPR_VAR: fprintf(firout, "v%d", p.varno); break;
+    case OPR_TMP: fprintf(firout, "t%d", p.tmpno); break;
+    case OPR_LBL: fprintf(firout, "label%d", p.lblno); break;
     default: return;
   }
 }
 
 static void print_opt(Token op) {
   switch (op) {
-    case kEQ: printf("=="); break;
-    case kNEQ: printf("!="); break;
-    case kLT: printf("<"); break;
-    case kLE: printf("<="); break;
-    case kGT: printf(">"); break;
-    case kGE: printf(">="); break;
-    case kPLUS: printf("+"); break;
-    case kMINUS: printf("-"); break;
-    case kSTAR: printf("*"); break;
-    case kDIV: printf("/"); break;
+    case kEQ: fprintf(firout, "=="); break;
+    case kNEQ: fprintf(firout, "!="); break;
+    case kLT: fprintf(firout, "<"); break;
+    case kLE: fprintf(firout, "<="); break;
+    case kGT: fprintf(firout, ">"); break;
+    case kGE: fprintf(firout, ">="); break;
+    case kPLUS: fprintf(firout, "+"); break;
+    case kMINUS: fprintf(firout, "-"); break;
+    case kSTAR: fprintf(firout, "*"); break;
+    case kDIV: fprintf(firout, "/"); break;
     default: return;
   }
 }
@@ -35,86 +37,86 @@ VISITOR_DEF(IR, visitor)
 void print_ir(Irnode *p) {
   while (p != NULL) {
     IrVisitorDispatch(&visitor, p, NULL);
-    putchar('\n');
+    fputc('\n', firout);
     p = p->nxt;
   }
 }
 
 IR_MAKE_VISIT(IR_ASN) {
   print_opr(p->dst);
-  printf(" := ");
+  fprintf(firout, " := ");
   print_opr(p->src1);
 }
 
 IR_MAKE_VISIT(IR_ARI) {
   print_opr(p->dst);
-  printf(" := ");
+  fprintf(firout, " := ");
   print_opr(p->src1);
-  putchar(' ');
+  fputc(' ', firout);
   print_opt(p->op);
-  putchar(' ');
+  fputc(' ', firout);
   print_opr(p->src2);
 }
 
 IR_MAKE_VISIT(IR_DEC) {
-  printf("DEC ");
+  fprintf(firout, "DEC ");
   print_opr(p->dst);
-  printf(" %d", p->src1.litval);
+  fprintf(firout, " %d", p->src1.litval);
 }
 
 IR_MAKE_VISIT(IR_LBL) {
-  printf("LABEL ");
+  fprintf(firout, "LABEL ");
   print_opr(p->dst);
-  printf(" :");
+  fprintf(firout, " :");
 }
 
 IR_MAKE_VISIT(IR_JMP) {
-  printf("GOTO ");
+  fprintf(firout, "GOTO ");
   print_opr(p->dst);
 }
 
 IR_MAKE_VISIT(IR_JCN) {
-  printf("IF ");
+  fprintf(firout, "IF ");
   print_opr(p->src1);
-  putchar(' ');
+  fputc(' ', firout);
   print_opt(p->op);
-  putchar(' ');
+  fputc(' ', firout);
   print_opr(p->src2);
-  printf(" GOTO ");
+  fprintf(firout, " GOTO ");
   print_opr(p->dst);
 }
 
 IR_MAKE_VISIT(IR_FUN) {
-  printf("FUNCTION %s :", p->fun_name);
+  fprintf(firout, "FUNCTION %s :", p->fun_name);
 }
 
 IR_MAKE_VISIT(IR_PAR) {
-  printf("PARAM ");
+  fprintf(firout, "PARAM ");
   print_opr(p->dst);
 }
 
 IR_MAKE_VISIT(IR_RET) {
-  printf("RETURN ");
+  fprintf(firout, "RETURN ");
   print_opr(p->dst);
 }
 
 IR_MAKE_VISIT(IR_CAL) {
   print_opr(p->dst);
-  printf(" := CALL %s", p->fun_name);
+  fprintf(firout, " := CALL %s", p->fun_name);
 }
 
 IR_MAKE_VISIT(IR_ARG) {
-  printf("ARG ");
+  fprintf(firout, "ARG ");
   print_opr(p->dst);
 } 
 
 IR_MAKE_VISIT(IR_RED) {
-  printf("READ ");
+  fprintf(firout, "READ ");
   print_opr(p->dst);
 }
 
 IR_MAKE_VISIT(IR_RIT) {
-  printf("WRITE ");
+  fprintf(firout, "WRITE ");
   print_opr(p->dst);
 }
 

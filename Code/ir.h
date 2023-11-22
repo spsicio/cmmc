@@ -68,6 +68,7 @@ typedef struct Irlist {
   struct Irnode *head, *tail;
 } Irlist;
 
+extern FILE *firout;
 Irnode* alloc_ir_f(IR_KIND kind, const char*);
 Irnode* alloc_ir_d(IR_KIND kind, Opr);
 Irnode* alloc_ir_df(IR_KIND kind, Opr, const char*);
