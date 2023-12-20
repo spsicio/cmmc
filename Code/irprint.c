@@ -108,7 +108,7 @@ IR_MAKE_VISIT(IR_CAL) {
 IR_MAKE_VISIT(IR_ARG) {
   fprintf(firout, "ARG ");
   print_opr(p->dst);
-} 
+}
 
 IR_MAKE_VISIT(IR_RED) {
   fprintf(firout, "READ ");

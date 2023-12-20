@@ -2,6 +2,7 @@
 #include <string.h>
 #include "symtab.h"
 #include "ir.h"
+#include "oprtab.h"
 
 int cnt_var = 0, cnt_tmp = 0, cnt_lbl = 0;
 
@@ -372,6 +373,9 @@ AST_MAKE_VISIT(DEF_VAR) {
     if (ent->type->kind == kARRAY) {  // DEC
       ent->varno = ++cnt_var;
       ent->ref = false;
+      symstr name; sprintf(name, "v%d", ent->varno);
+      Oprent *oprent = oprtab_access(name);
+      oprent->siz = ent->type->array.siz;
       Irnode *node_dec = alloc_ir_ds(IR_DEC,
           lookup_var(p->def_var.name), make_litval(p->type.array.siz));
       node_dec->dst.ref = false;

@@ -3,6 +3,7 @@ report.pdf
 
 Code/parser
 Code/a.c
+Code/a.s
 Code/*.ir
 Code/*.o
 
