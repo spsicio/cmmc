@@ -54,21 +54,21 @@ AvailableExpressionsAnalysis_isForward (AvailableExpressionsAnalysis *t) {
 
 static Fact_set_var*
 AvailableExpressionsAnalysis_newBoundaryFact (AvailableExpressionsAnalysis *t, IR_function *func) {
-    /* TODO:
+    /* DONE:
      * OutFact[Entry] = (Bottom: empty set) / (Top: universal set) / other?
      * return NEW(Fact_set_var, is_top?);
      */
-    TODO();
+  return NEW(Fact_set_var, false);
 }
 
 static Fact_set_var*
 AvailableExpressionsAnalysis_newInitialFact (AvailableExpressionsAnalysis *t) {
-    /* TODO:
+    /* DONE:
      * Must/May Analysis ?
      * InitFact = (Bottom: empty set) / (Top: universal set) / other?
      * return NEW(Fact_set_var, is_top?);
      */
-    TODO();
+  return NEW(Fact_set_var, true);
 }
 
 static void
@@ -107,12 +107,12 @@ AvailableExpressionsAnalysis_meetInto (AvailableExpressionsAnalysis *t,
         VCALL(target->set, union_with, &fact->set);
         return true;
     }
-    /* TODO:
+    /* DONE:
      * Must/May Analysis ?
      * IN[blk] = union_with / intersect_with (all OUT[pred_blk]) ?
      * return VCALL(target->set, union_with / intersect_with, &fact->set);
      */
-    TODO();
+    return VCALL(target->set, intersect_with, &fact->set);
 }
 
 void AvailableExpressionsAnalysis_transferStmt (AvailableExpressionsAnalysis *t,

@@ -17,8 +17,8 @@ static void LiveVariableAnalysis_teardown(LiveVariableAnalysis *t) {
 
 static bool
 LiveVariableAnalysis_isForward (LiveVariableAnalysis *t) {
-    // TODO: return isForward?;
-    TODO();
+  // DONE: return isForward?;
+  return false;
 }
 
 static Set_IR_var*
@@ -59,11 +59,11 @@ static bool
 LiveVariableAnalysis_meetInto (LiveVariableAnalysis *t,
                                Set_IR_var *fact,
                                Set_IR_var *target) {
-    /* TODO:
-     * meet: union/intersect?
-     * return VCALL(*target, union_with/intersect_with?, fact);
-     */
-    TODO();
+  /* DONE:
+   * meet: union/intersect?
+   * return VCALL(*target, union_with/intersect_with?, fact);
+   */
+  return VCALL(*target, union_with, fact);
 }
 
 void LiveVariableAnalysis_transferStmt (LiveVariableAnalysis *t,
@@ -71,7 +71,7 @@ void LiveVariableAnalysis_transferStmt (LiveVariableAnalysis *t,
                                         Set_IR_var *fact) {
     IR_var def = VCALL(*stmt, get_def);
     IR_use use = VCALL(*stmt, get_use_vec);
-    /* TODO:
+    /* DONE:
      * kill/gen?
      * 先执行kill还是先执行gen?
      * use:
@@ -87,7 +87,16 @@ void LiveVariableAnalysis_transferStmt (LiveVariableAnalysis *t,
      *      VCALL(*fact, insert/delete?, def); // kill/gen ?
      *  }
      */
-    TODO();
+    if (def != IR_VAR_NONE) { // 生成新def
+      VCALL(*fact, delete, def);
+    }
+    for (unsigned i = 0; i < use.use_cnt; i++) {
+      IR_val use_val = use.use_vec[i];
+      if (!use_val.is_const) {
+        IR_var use = use_val.var;
+        VCALL(*fact, insert, use);
+      }     
+    }
 }
 
 bool LiveVariableAnalysis_transferBlock (LiveVariableAnalysis *t,
@@ -159,14 +168,17 @@ static bool block_remove_dead_def (LiveVariableAnalysis *t, IR_block *blk) {
         if(stmt->stmt_type == IR_OP_STMT || stmt->stmt_type == IR_ASSIGN_STMT) {
             IR_var def = VCALL(*stmt, get_def);
             if(def == IR_VAR_NONE) continue;
-            /* TODO:
+            /* DONE:
              * def具有什么性质可以被标记为死代码?
              * if(VCALL(*new_out_fact, exist, def) == true/false?) {
              *      stmt->dead = true;
              *      updated = true;
              *  }
              */
-            TODO();
+            if (VCALL(*new_out_fact, exist, def) == false) {
+              stmt->dead = true;
+              updated = true;
+            }
         }
         LiveVariableAnalysis_transferStmt(t, stmt, new_out_fact);
     }

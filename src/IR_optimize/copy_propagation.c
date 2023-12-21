@@ -29,20 +29,19 @@ static void CopyPropagation_teardown(CopyPropagation *t) {
 
 static bool
 CopyPropagation_isForward (CopyPropagation *t) {
-    // TODO: isForward?
-    TODO();
+    return true;
 }
 
 static Fact_def_use*
 CopyPropagation_newBoundaryFact (CopyPropagation *t, IR_function *func) {
-    // TODO: return NEW(Fact_def_use, is_top?);
-    TODO();
+  // DONE: return NEW(Fact_def_use, is_top?);
+  return NEW(Fact_def_use, false);
 }
 
 static Fact_def_use*
 CopyPropagation_newInitialFact (CopyPropagation *t) {
-    // TODO: return NEW(Fact_def_use, is_top?);
-    TODO();
+  // DONE: return NEW(Fact_def_use, is_top?);
+  return NEW(Fact_def_use, true);
 }
 
 static void
@@ -107,19 +106,19 @@ void CopyPropagation_transferStmt (CopyPropagation *t,
     if(new_def != IR_VAR_NONE) {
         if(VCALL(fact->def_to_use, exist, new_def)) {
             IR_var use = VCALL(fact->def_to_use, get, new_def);
-            /* TODO:
+            /* DONE:
              * use is killed by new_def
              * VCALL(fact->def_to_use/use_to_def?, delete, use/new_def?);
              */ 
-            TODO();
+            VCALL(fact->def_to_use, delete, new_def);
         }
         if(VCALL(fact->use_to_def, exist, new_def)) {
             IR_var def = VCALL(fact->use_to_def, get, new_def);
-            /* TODO:
+            /* DONE:
              * def is killed by new_def
              * VCALL(fact->def_to_use/use_to_def?, delete, def/new_def?);
              */ 
-            TODO();
+            VCALL(fact->use_to_def, delete, new_def);
         }
     }
     //// copy_gen
@@ -127,11 +126,11 @@ void CopyPropagation_transferStmt (CopyPropagation *t,
         IR_assign_stmt *assign_stmt = (IR_assign_stmt*)stmt;
         if(!assign_stmt->rs.is_const) {
             IR_var def = assign_stmt->rd, use = assign_stmt->rs.var;
-            /* TODO:
+            /* DONE:
              * def is killed by new_def
              * VCALL(fact->def_to_use/use_to_def?, set, def/use?);
              */ 
-            TODO();
+            VCALL(fact->def_to_use, set, def, use);
         }
     }
 }
