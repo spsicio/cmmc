@@ -1,0 +1,219 @@
+FUNCTION factorial :
+PARAM v0
+v1 := #1
+LABEL label0 :
+t0 := v0
+t1 := #1
+IF t0 > t1 GOTO label1
+GOTO label2
+LABEL label1 :
+t4 := v1
+t5 := v0
+t3 := t4 * t5
+v1 := t3
+t2 := v1
+t8 := v0
+t9 := #1
+t7 := t8 - t9
+v0 := t7
+t6 := v0
+GOTO label0
+LABEL label2 :
+t10 := v1
+RETURN t10
+FUNCTION cal_combiniation :
+PARAM v2
+PARAM v3
+t14 := v2
+ARG t14
+t12 := CALL factorial
+t17 := v3
+ARG t17
+t15 := CALL factorial
+t19 := v2
+t20 := v3
+t18 := t19 - t20
+ARG t18
+t16 := CALL factorial
+t13 := t15 * t16
+t11 := t12 / t13
+RETURN t11
+FUNCTION cal_permutation :
+PARAM v4
+PARAM v5
+t24 := v4
+ARG t24
+t22 := CALL factorial
+t26 := v4
+t27 := v5
+t25 := t26 - t27
+ARG t25
+t23 := CALL factorial
+t21 := t22 / t23
+RETURN t21
+FUNCTION isqrt :
+PARAM v6
+v7 := #0
+LABEL label3 :
+t28 := v7
+t29 := v6
+IF t28 < t29 GOTO label4
+GOTO label5
+LABEL label4 :
+t32 := v7
+t33 := v7
+t30 := t32 * t33
+t31 := v6
+IF t30 <= t31 GOTO label8
+GOTO label7
+LABEL label8 :
+t38 := v7
+t39 := #1
+t36 := t38 + t39
+t40 := v7
+t41 := #1
+t37 := t40 + t41
+t34 := t36 * t37
+t35 := v6
+IF t34 > t35 GOTO label6
+GOTO label7
+LABEL label6 :
+t42 := v7
+RETURN t42
+LABEL label7 :
+t45 := v7
+t46 := #1
+t44 := t45 + t46
+v7 := t44
+t43 := v7
+GOTO label3
+LABEL label5 :
+t48 := #1
+t47 := #0 - t48
+RETURN t47
+FUNCTION mod :
+PARAM v8
+PARAM v9
+t49 := v8
+t50 := #0
+IF t49 < t50 GOTO label9
+GOTO label12
+LABEL label12 :
+t51 := v9
+t52 := #0
+IF t51 <= t52 GOTO label9
+GOTO label10
+LABEL label9 :
+t54 := #1
+t53 := #0 - t54
+RETURN t53
+GOTO label11
+LABEL label10 :
+t56 := v8
+t60 := v8
+t61 := v9
+t58 := t60 / t61
+t59 := v9
+t57 := t58 * t59
+t55 := t56 - t57
+RETURN t55
+LABEL label11 :
+FUNCTION is_prime :
+PARAM v10
+v11 := #2
+t62 := v10
+ARG t62
+v12 := CALL isqrt
+LABEL label13 :
+t63 := v11
+t64 := v12
+IF t63 <= t64 GOTO label14
+GOTO label15
+LABEL label14 :
+t67 := v10
+t68 := v11
+ARG t68
+ARG t67
+t65 := CALL mod
+t66 := #0
+IF t65 == t66 GOTO label16
+GOTO label17
+LABEL label16 :
+t69 := #0
+RETURN t69
+LABEL label17 :
+t72 := v11
+t73 := #1
+t71 := t72 + t73
+v11 := t71
+t70 := v11
+GOTO label13
+LABEL label15 :
+t74 := #1
+RETURN t74
+FUNCTION main :
+READ v13
+READ v14
+t75 := v13
+t76 := v14
+ARG t76
+ARG t75
+v15 := CALL cal_combiniation
+t77 := v13
+t78 := v14
+ARG t78
+ARG t77
+v16 := CALL cal_permutation
+v17 := #1
+LABEL label18 :
+t79 := v17
+t80 := v15
+IF t79 <= t80 GOTO label19
+GOTO label20
+LABEL label19 :
+t82 := v17
+ARG t82
+t81 := CALL is_prime
+IF t81 != #0 GOTO label21
+GOTO label22
+LABEL label21 :
+t84 := v17
+WRITE t84
+t83 := #0
+LABEL label22 :
+t87 := v17
+t88 := #1
+t86 := t87 + t88
+v17 := t86
+t85 := v17
+GOTO label18
+LABEL label20 :
+t90 := #1
+v17 := t90
+t89 := v17
+LABEL label23 :
+t91 := v17
+t92 := v16
+IF t91 <= t92 GOTO label24
+GOTO label25
+LABEL label24 :
+t94 := v17
+ARG t94
+t93 := CALL is_prime
+IF t93 != #0 GOTO label26
+GOTO label27
+LABEL label26 :
+t96 := v17
+WRITE t96
+t95 := #0
+LABEL label27 :
+t99 := v17
+t100 := #1
+t98 := t99 + t100
+v17 := t98
+t97 := v17
+GOTO label23
+LABEL label25 :
+t101 := #0
+RETURN t101
+

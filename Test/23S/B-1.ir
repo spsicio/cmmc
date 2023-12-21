@@ -1,0 +1,73 @@
+FUNCTION factorial :
+PARAM v0
+v1 := #1
+LABEL label0 :
+t0 := v0
+t1 := #1
+IF t0 > t1 GOTO label1
+GOTO label2
+LABEL label1 :
+t4 := v1
+t5 := v0
+t3 := t4 * t5
+v1 := t3
+t2 := v1
+t8 := v0
+t9 := #1
+t7 := t8 - t9
+v0 := t7
+t6 := v0
+GOTO label0
+LABEL label2 :
+t10 := v1
+RETURN t10
+FUNCTION cal_combiniation :
+PARAM v2
+PARAM v3
+t14 := v2
+ARG t14
+t12 := CALL factorial
+t17 := v3
+ARG t17
+t15 := CALL factorial
+t19 := v2
+t20 := v3
+t18 := t19 - t20
+ARG t18
+t16 := CALL factorial
+t13 := t15 * t16
+t11 := t12 / t13
+RETURN t11
+FUNCTION cal_permutation :
+PARAM v4
+PARAM v5
+t24 := v4
+ARG t24
+t22 := CALL factorial
+t26 := v4
+t27 := v5
+t25 := t26 - t27
+ARG t25
+t23 := CALL factorial
+t21 := t22 / t23
+RETURN t21
+FUNCTION main :
+READ v6
+READ v7
+t30 := v6
+t31 := v7
+ARG t31
+ARG t30
+t29 := CALL cal_combiniation
+WRITE t29
+t28 := #0
+t34 := v6
+t35 := v7
+ARG t35
+ARG t34
+t33 := CALL cal_permutation
+WRITE t33
+t32 := #0
+t36 := #0
+RETURN t36
+

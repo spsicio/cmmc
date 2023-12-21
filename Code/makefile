@@ -101,7 +101,7 @@ $(OBJ_DIR)/%.o: $(IR_PARSE_GENERATE_DIR)/%.c $(IR_SYNTAX_TAB_C)
 -include $(OBJS:.o=.d)
 
 
-.PHONY: all build clean run gdb test
+.PHONY: all build clean run gdb test submit
 .DEFAULT_GOAL = $(PARSER)
 
 all: $(PARSER)
@@ -119,3 +119,7 @@ gdb: all
 
 test: all # Add args
 	$(PARSER) 
+
+submit:
+	-rm ../211502020.zip
+	zip -r ../211502020.zip ../README.md ../Code/include ../Code/src ../Code/makefile ../report.pdf

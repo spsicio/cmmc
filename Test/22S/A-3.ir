@@ -1,0 +1,157 @@
+FUNCTION main :
+v2 := #0
+v3 := #0
+v4 := #10
+DEC v5 40
+v6 := #0
+t1 := #0
+v3 := t1
+t0 := v3
+LABEL label0 :
+t2 := v3
+t3 := v4
+IF t2 < t3 GOTO label1
+GOTO label2
+LABEL label1 :
+t7 := #0
+t8 := v3
+t8 := t8 * #4
+t7 := t7 + t8
+t9 := &v5
+t5 := t9 + t7
+t6 := #0
+*t5 := t6
+t12 := v3
+t13 := #1
+t11 := t12 + t13
+v3 := t11
+t10 := v3
+GOTO label0
+LABEL label2 :
+t15 := #0
+v2 := t15
+t14 := v2
+LABEL label3 :
+t16 := v2
+t17 := #3
+IF t16 < t17 GOTO label4
+GOTO label5
+LABEL label4 :
+READ t19
+v0 := t19
+t18 := v0
+READ t21
+v1 := t21
+t20 := v1
+t22 := v0
+t23 := #10
+IF t22 > t23 GOTO label6
+GOTO label7
+LABEL label6 :
+t28 := #1
+t29 := v0
+t26 := t28 + t29
+t32 := v0
+t33 := #10
+t30 := t32 / t33
+t31 := #10
+t27 := t30 * t31
+t25 := t26 - t27
+v0 := t25
+t24 := v0
+LABEL label7 :
+t34 := v1
+t35 := #10
+IF t34 > t35 GOTO label8
+GOTO label9
+LABEL label8 :
+t40 := #2
+t41 := v1
+t38 := t40 + t41
+t44 := v1
+t45 := #10
+t42 := t44 / t45
+t43 := #10
+t39 := t42 * t43
+t37 := t38 - t39
+v1 := t37
+t36 := v1
+LABEL label9 :
+t47 := #0
+v3 := t47
+t46 := v3
+LABEL label10 :
+t48 := v3
+t49 := v4
+IF t48 < t49 GOTO label11
+GOTO label12
+LABEL label11 :
+t53 := #0
+t54 := v3
+t54 := t54 * #4
+t53 := t53 + t54
+t55 := &v5
+t51 := t55 + t53
+t63 := #0
+t64 := v3
+t64 := t64 * #4
+t63 := t63 + t64
+t65 := &v5
+t62 := t65 + t63
+t60 := *t62
+t61 := #2
+t58 := t60 / t61
+t59 := v0
+t56 := t58 + t59
+t57 := v1
+t52 := t56 - t57
+*t51 := t52
+t68 := v3
+t69 := #1
+t67 := t68 + t69
+v3 := t67
+t66 := v3
+GOTO label10
+LABEL label12 :
+t72 := v2
+t73 := #1
+t71 := t72 + t73
+v2 := t71
+t70 := v2
+GOTO label3
+LABEL label5 :
+t75 := #0
+v3 := t75
+t74 := v3
+LABEL label13 :
+t76 := v3
+t77 := v4
+IF t76 < t77 GOTO label14
+GOTO label15
+LABEL label14 :
+t80 := v6
+t83 := #0
+t84 := v3
+t84 := t84 * #4
+t83 := t83 + t84
+t85 := &v5
+t82 := t85 + t83
+t81 := *t82
+t79 := t80 + t81
+v6 := t79
+t78 := v6
+t88 := v3
+t89 := #1
+t87 := t88 + t89
+v3 := t87
+t86 := v3
+GOTO label13
+LABEL label15 :
+t91 := v6
+WRITE t91
+t90 := #0
+t92 := #0
+RETURN t92
+
+
+

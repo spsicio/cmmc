@@ -111,6 +111,7 @@ void CopyPropagation_transferStmt (CopyPropagation *t,
              * VCALL(fact->def_to_use/use_to_def?, delete, use/new_def?);
              */ 
             VCALL(fact->def_to_use, delete, new_def);
+            VCALL(fact->use_to_def, delete, use);
         }
         if(VCALL(fact->use_to_def, exist, new_def)) {
             IR_var def = VCALL(fact->use_to_def, get, new_def);
@@ -119,6 +120,7 @@ void CopyPropagation_transferStmt (CopyPropagation *t,
              * VCALL(fact->def_to_use/use_to_def?, delete, def/new_def?);
              */ 
             VCALL(fact->use_to_def, delete, new_def);
+            VCALL(fact->def_to_use, delete, def);
         }
     }
     //// copy_gen
@@ -131,6 +133,7 @@ void CopyPropagation_transferStmt (CopyPropagation *t,
              * VCALL(fact->def_to_use/use_to_def?, set, def/use?);
              */ 
             VCALL(fact->def_to_use, set, def, use);
+            VCALL(fact->use_to_def, set, use, def);
         }
     }
 }

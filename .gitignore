@@ -1,6 +1,7 @@
 report.pdf
 211502020.zip
 
-build
-parser
+Code/build
+Code/parser
+Code/*.ir
 

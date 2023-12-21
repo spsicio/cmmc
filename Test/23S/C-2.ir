@@ -1,0 +1,196 @@
+FUNCTION mod :
+PARAM v0
+PARAM v1
+t1 := v0
+t5 := v0
+t6 := v1
+t3 := t5 / t6
+t4 := v1
+t2 := t3 * t4
+t0 := t1 - t2
+RETURN t0
+FUNCTION gcd :
+PARAM v2
+PARAM v3
+t7 := v2
+t8 := #0
+IF t7 == t8 GOTO label0
+GOTO label1
+LABEL label0 :
+t9 := v3
+RETURN t9
+LABEL label1 :
+t12 := v3
+t13 := v2
+ARG t13
+ARG t12
+t11 := CALL mod
+t14 := v2
+ARG t14
+ARG t11
+t10 := CALL gcd
+RETURN t10
+FUNCTION lcm :
+PARAM v4
+PARAM v5
+t18 := v4
+t19 := v5
+t16 := t18 * t19
+t20 := v4
+t21 := v5
+ARG t21
+ARG t20
+t17 := CALL gcd
+t15 := t16 / t17
+RETURN t15
+FUNCTION main :
+v10 := #0
+DEC v11 200
+DEC v12 200
+READ t23
+v6 := t23
+t22 := v6
+t25 := #0
+v7 := t25
+t24 := v7
+LABEL label2 :
+t26 := v7
+t27 := v6
+IF t26 < t27 GOTO label3
+GOTO label4
+LABEL label3 :
+t31 := #0
+t32 := v7
+t32 := t32 * #4
+t31 := t31 + t32
+t33 := &v11
+t29 := t33 + t31
+READ t30
+*t29 := t30
+t37 := #0
+t38 := v7
+t38 := t38 * #4
+t37 := t37 + t38
+t39 := &v12
+t35 := t39 + t37
+READ t36
+*t35 := t36
+t42 := v7
+t43 := #1
+t41 := t42 + t43
+v7 := t41
+t40 := v7
+GOTO label2
+LABEL label4 :
+t47 := #0
+t48 := #0
+t48 := t48 * #4
+t47 := t47 + t48
+t49 := &v12
+t46 := t49 + t47
+t45 := *t46
+v9 := t45
+t44 := v9
+t51 := #1
+v7 := t51
+t50 := v7
+LABEL label5 :
+t52 := v7
+t53 := v6
+IF t52 < t53 GOTO label6
+GOTO label7
+LABEL label6 :
+t56 := v9
+t59 := #0
+t60 := v7
+t60 := t60 * #4
+t59 := t59 + t60
+t61 := &v12
+t58 := t61 + t59
+t57 := *t58
+ARG t57
+ARG t56
+t55 := CALL lcm
+v9 := t55
+t54 := v9
+t64 := v7
+t65 := #1
+t63 := t64 + t65
+v7 := t63
+t62 := v7
+GOTO label5
+LABEL label7 :
+t67 := #0
+v7 := t67
+t66 := v7
+LABEL label8 :
+t68 := v7
+t69 := v6
+IF t68 < t69 GOTO label9
+GOTO label10
+LABEL label9 :
+t72 := v10
+t77 := #0
+t78 := v7
+t78 := t78 * #4
+t77 := t77 + t78
+t79 := &v11
+t76 := t79 + t77
+t74 := *t76
+t80 := v9
+t83 := #0
+t84 := v7
+t84 := t84 * #4
+t83 := t83 + t84
+t85 := &v12
+t82 := t85 + t83
+t81 := *t82
+t75 := t80 / t81
+t73 := t74 * t75
+t71 := t72 + t73
+v10 := t71
+t70 := v10
+t88 := v7
+t89 := #1
+t87 := t88 + t89
+v7 := t87
+t86 := v7
+GOTO label8
+LABEL label10 :
+t92 := v10
+t93 := v9
+ARG t93
+ARG t92
+t91 := CALL gcd
+v8 := t91
+t90 := v8
+t96 := v10
+t97 := v8
+t95 := t96 / t97
+v10 := t95
+t94 := v10
+t100 := v9
+t101 := v8
+t99 := t100 / t101
+v9 := t99
+t98 := v9
+t102 := v9
+t103 := #1
+IF t102 == t103 GOTO label11
+GOTO label12
+LABEL label11 :
+t105 := v10
+WRITE t105
+t104 := #0
+GOTO label13
+LABEL label12 :
+t107 := v10
+WRITE t107
+t106 := #0
+t109 := v9
+WRITE t109
+t108 := #0
+LABEL label13 :
+t110 := #0
+RETURN t110
+
